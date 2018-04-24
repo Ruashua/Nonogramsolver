@@ -1,21 +1,18 @@
 #include "Puzzle.h"
 
 
-Puzzle::Puzzle()
+Puzzle::Puzzle() :_width(0), _height(0)
 {
 	tomographyWidth = nullptr;
 	tomographyHeight = nullptr;
 	theGrid = nullptr;
-	_height = 0;
-	_width = 0;
 	colors = nullptr;
 	bgColor = "255 255 255 ";
 	numberOfColors = 0;
 }
-Puzzle::Puzzle(int w, int h, int c)
+Puzzle::Puzzle(int w, int h, int c):_width(w), _height(h)
 {
-	_width = w;
-	_height = h;
+
 	if (c == 0)
 	{
 		numberOfColors = 1;
@@ -225,4 +222,84 @@ bool Puzzle::bruteForceValidity(short** theGrid, Tomography* tomographyWidth, To
 
 	}
 	return true;
+}
+
+void Puzzle::bruteForce()
+{
+	int i, j;
+
+
+	bool valid = true;
+	bool needBacktrack = false;
+	i = 0;
+
+	time_t startTime = time(0);
+	bool tooLong = false;
+
+	while (i < _width)
+	{
+		j = 0;
+		while (j < _height)
+		{
+
+
+			if (needBacktrack && theGrid[i][j] == 1)
+			{
+				theGrid[i][j] = 0;
+				needBacktrack = true;
+
+				j = j - 2;
+			}
+			else
+			{
+				if (valid)
+				{
+					theGrid[i][j] = 2;
+				}
+				valid = true;
+				if (needBacktrack && theGrid[i][j] == 2)
+				{
+					theGrid[i][j] = 1;
+					needBacktrack = false;
+				}
+				if (DEBUG)
+				{
+					printTheGrid();
+					//std::system("pause");
+					//
+				}
+
+				valid = bruteForceValidity(theGrid, tomographyWidth, tomographyHeight, i, j, tooLong, startTime);
+
+				if (!valid)
+				{
+					if (theGrid[i][j] == 2)
+					{
+						theGrid[i][j] = 1;
+						j--;
+					}
+					else
+					{
+						theGrid[i][j] = 0;
+						needBacktrack = true;
+						j = j - 2;
+					}
+				}
+			}
+
+			j++;
+			if (j < 0)
+			{
+				i--;
+				j = _height - 1;
+			}
+			if (i < 0)
+			{
+				cout << "This one is impossible: ";
+			}
+
+		}
+		i++;
+	}
+	cout << "DONE! ";
 }

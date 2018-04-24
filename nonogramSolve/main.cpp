@@ -12,9 +12,7 @@ using namespace std;
 //0 is blank
 //1 is X'ed
 //2+ are filled (+ for colors)
-static bool DEBUG = false;
-//static bool PRETTYPRINT = false;
-static string DEFAULTBGCOLOR = "255 255 255 ";
+
 
 
 string colorHexToRgb(string hexColor)
@@ -575,22 +573,23 @@ int main()
 		"C:\\Users\\holtza\\Documents\\nono\\15x15trivial.txt",
 		"C:\\Users\\holtza\\Documents\\nono\\15x15turtle.txt",
 		//"C:\\Users\\holtza\\Documents\\nono\\15x20cock.txt",
-		"C:\\Users\\holtza\\Documents\\nono\\20x15goldfish.txt",
-		//"C:\\Users\\holtza\\Documents\\nono\\20x20peacock.txt",*/
+		"C:\\Users\\holtza\\Documents\\nono\\20x15goldfish.txt",*/
+		"C:\\Users\\holtza\\Documents\\nono\\20x20peacock.txt",//
 		//"C:\\Users\\holtza\\Documents\\nono\\25x25lion.txt",
 		//"C:\\Users\\holtza\\Documents\\nono\\80x80MichaelJackson.txt",
-		"C:\\Users\\holtza\\Documents\\nono\\C8x8Mushroom.txt" 
+		//"C:\\Users\\holtza\\Documents\\nono\\C8x8Mushroom.txt" 
 	};
 	//std::system("pause");
 	
 	for (int i = 0; i < sizeof(inputFiles) / sizeof(inputFiles[0]); i++)
 	{
 
-		if (PRETTYPRINT)
-		{
-
-		}
-		readFile(tomographyWidth, tomographyHeight, inputFiles[i]);
+		readFile(puzzle, inputFiles[0]);
+		puzzle->bruteForce();
+		outputPicture(puzzle, inputFiles[i].substr(0, inputFiles[i].size() - 3) + "ppm");
+		cout << inputFiles[i] << endl;
+		delete puzzle;
+		//readFile(tomographyWidth, tomographyHeight, inputFiles[i]);
 
 		/*
 		short** theGrid;
@@ -613,7 +612,7 @@ int main()
 		cout << inputFiles[i] << endl;//*/
 	}
 
-	delete puzzle;
+	
 
 	std::system("pause");
 	return 0;
