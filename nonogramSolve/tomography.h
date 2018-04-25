@@ -18,6 +18,6 @@ public:
 	Tomography();
 	~Tomography();
 
-	void print(int dimension);
+	void print();
 };
 

@@ -21,11 +21,11 @@ Tomography::Tomography()
 
 Tomography::~Tomography()
 {
-	for (int i = 0; dimensionSize; i++)
+	for (int i = 0; i < dimensionSize; i++)
 	{
 		if (sizes != nullptr)
 		{
-			for (int j = 0; sizes; i++)
+			for (int j = 0; j < sizes[i]; j++)
 			{
 				delete tomography[i][j];
 			}
@@ -37,13 +37,13 @@ Tomography::~Tomography()
 	delete[] sizes;
 }
 
-void Tomography::print(int dimension)
+void Tomography::print()
 {
-	for (int i = 0; i < dimension; i++)
+	for (int i = 0; i < dimensionSize; i++)
 	{
 		for (int j = 0; j < sizes[i]; j++)
 		{
-			cout << tomography[i][j]->number << ',';
+			cout << tomography[i][j]->number << "|" << tomography[i][j]->color << ',';
 		}
 		cout << endl;
 	}

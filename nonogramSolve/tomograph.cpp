@@ -1,8 +1,9 @@
 #include "Tomograph.h"
 
-Tomograph::Tomograph(int n)
+Tomograph::Tomograph(int n, int c)
 {
 	number = n;
+	color = c;
 	finished = false;
 }
 

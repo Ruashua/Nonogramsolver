@@ -1,5 +1,8 @@
 #pragma once
-
+//States of the grid 
+//0 is blank
+//1 is X'ed
+//2+ are filled (+ for colors)
 #include <string>
 #include <ctime>
 #include "tomography.h"
@@ -28,7 +31,7 @@ public:
 	~Puzzle();
 
 	void printTheGrid();
-	bool bruteForceValidity(short** theGrid, Tomography* tomographyWidth, Tomography* tomographyHeight, int i, int j, bool& tooLong, time_t& startTime);
-	void Puzzle::bruteForce();
+	bool bruteForceValidity(int i, int j, bool& tooLong, time_t& startTime);
+	void bruteForce();
 };
 
