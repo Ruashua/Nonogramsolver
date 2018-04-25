@@ -227,12 +227,81 @@ bool Puzzle::bruteForceValidity(int i, int j, bool& tooLong, time_t& startTime)
 {
 	int count;
 	int tomographyLocation;
-
+	if (i == 0)
+	{
+		i = i;
+	}
 	tomographyLocation = 0;
 	count = 0;
 	for (int k = 0; k < _height; k++)
 	{
-		if (theGrid[i][k] >= 2 && tomographyLocation < tomographyWidth->sizes[i] && tomographyWidth->tomography[i][tomographyLocation]->color == theGrid[i][k] - 1)
+		if (theGrid[i][k] != 0 && tomographyLocation < tomographyWidth->sizes[i] && tomographyWidth->tomography[i][tomographyLocation]->number == count && theGrid[i][k] - 1 != tomographyWidth->tomography[i][tomographyLocation]->color)
+		{
+			//The space must be filled, the tomography must not be completed, the filled section must be the length defined in the tomography, and it must have switched to a new color
+			//Then it changes to the next tomography definition
+			tomographyLocation++;
+			count = 0;
+			if (PRETTYPRINT)
+			{
+				if (!tooLong)
+				{
+					if (j == k)
+					{
+						printTheGrid();
+						if (time(0) - startTime > PRINTTOOLONG)
+						{
+							tooLong = true;
+							startTime = time(0);
+						}
+					}
+				}
+				else if (time(0) - startTime > PRINTTOOLONGINTERVAL)
+				{
+					printTheGrid();
+					startTime = time(0);
+				}
+			}
+		}
+		if (tomographyLocation >= tomographyWidth->sizes[i]) //What has been filled is valid up to this point
+		{
+			if (theGrid[i][k] == 0) //You have reached the end of what has been filled
+			{
+				break;
+			}
+			if (theGrid[i][k] == 1) //This is a blank square, check the next square
+			{
+				continue;
+			}
+			if (theGrid[i][k] > 1) //But there is another filled space, must be invalid
+			{
+				return false;
+			}
+			
+		}
+		if (theGrid[i][k] > 1)  //If the space is filled
+		{
+			if (theGrid[i][k] - 1 == tomographyWidth->tomography[i][tomographyLocation]->color) //count blocks in a row of the same color
+			{
+				count++;
+			}
+			if (tomographyWidth->tomography[i][tomographyLocation]->number < count && theGrid[i][k] - 1 == tomographyWidth->tomography[i][tomographyLocation]->color) //row too long
+			{
+				return false;
+			}
+			if (theGrid[i][k] - 1 != tomographyWidth->tomography[i][tomographyLocation]->color && tomographyWidth->tomography[i][tomographyLocation]->number > count) //row is too small but switched to new color
+			{
+				return false;
+			}
+		}
+		if (theGrid[i][k] == 1 && tomographyWidth->tomography[i][tomographyLocation]->number > count && count > 0) //Prevents breaks with gaps
+		{
+			return false;
+		}
+		
+		
+		
+		
+		/*if (theGrid[i][k] >= 2 && tomographyLocation < tomographyWidth->sizes[i] && tomographyWidth->tomography[i][tomographyLocation]->color == theGrid[i][k] - 1)
 		{
 			count++;
 			if (tomographyLocation > tomographyWidth->sizes[i] - 1)
@@ -281,8 +350,9 @@ bool Puzzle::bruteForceValidity(int i, int j, bool& tooLong, time_t& startTime)
 					}
 				}
 			}
-		}
+		}*/
 	}
+	///*
 	if (j == _height - 1)
 	{
 		if (tomographyLocation < tomographyWidth->sizes[i])
@@ -314,14 +384,58 @@ bool Puzzle::bruteForceValidity(int i, int j, bool& tooLong, time_t& startTime)
 				}
 			}
 		}
-	}
+	}//*/
 
 
 	tomographyLocation = 0;
 	count = 0;
+	
 	for (int k = 0; k < _width; k++)
 	{
-		if (theGrid[k][j] >= 2 && tomographyHeight->tomography[j][tomographyLocation]->color == theGrid[k][j] - 2)
+		if (theGrid[k][j] != 0 && tomographyLocation < tomographyHeight->sizes[j] && tomographyHeight->tomography[j][tomographyLocation]->number == count && theGrid[k][j] - 1 != tomographyHeight->tomography[j][tomographyLocation]->color)
+		{
+			//The space must be filled, the tomography must not be completed, the filled section must be the length defined in the tomography, and it must have switched to a new color
+			//Then it changes to the next tomography definition
+			tomographyLocation++;
+			count = 0;
+		}
+		if (tomographyLocation >= tomographyHeight->sizes[j]) //What has been filled is valid up to this point
+		{
+			if (theGrid[k][j] == 0) //You have reached the end of what has been filled
+			{
+				break;
+			}
+			if (theGrid[k][j] == 1) //This is a blank square, check the next square
+			{
+				continue;
+			}
+			if (theGrid[k][j] > 1) //But there is another filled space, must be invalid
+			{
+				return false;
+			}
+
+		}
+		if (theGrid[k][j] > 1)  //If the space is filled
+		{
+			if (theGrid[k][j] - 1 == tomographyHeight->tomography[j][tomographyLocation]->color) //count blocks in a row of the same color
+			{
+				count++;
+			}
+			if (tomographyHeight->tomography[j][tomographyLocation]->number < count && theGrid[k][j] - 1 == tomographyHeight->tomography[j][tomographyLocation]->color) //row too long
+			{
+				return false;
+			}
+			if (theGrid[k][j] - 1 != tomographyHeight->tomography[j][tomographyLocation]->color && tomographyHeight->tomography[j][tomographyLocation]->number > count) //row is too small but switched to new color
+			{
+				return false;
+			}
+		}
+		if (theGrid[k][j] == 1 && tomographyHeight->tomography[j][tomographyLocation]->number > count && count > 0) //Prevents breaks with gaps
+		{
+			return false;
+		}
+
+		/*if (theGrid[k][j] >= 2 && tomographyHeight->tomography[j][tomographyLocation]->color == theGrid[k][j] - 2)
 		{
 			count++;
 			if (tomographyLocation > tomographyHeight->sizes[j] - 1)
@@ -350,8 +464,8 @@ bool Puzzle::bruteForceValidity(int i, int j, bool& tooLong, time_t& startTime)
 					count = 0;
 				}
 			}
-		}
-	}
+		}*/
+	}///*
 	if (i == _width - 1)
 	{
 		if (tomographyLocation < tomographyHeight->sizes[j])
@@ -362,7 +476,7 @@ bool Puzzle::bruteForceValidity(int i, int j, bool& tooLong, time_t& startTime)
 			}
 		}
 
-	}
+	}//*/
 	return true;
 }
 void Puzzle::bruteForce()
@@ -406,7 +520,7 @@ void Puzzle::bruteForce()
 				if (DEBUG)
 				{
 					printTheGrid();
-					std::system("pause");
+					//std::system("pause");
 					//
 				}
 

@@ -74,6 +74,7 @@ void readFile(Puzzle*& puzzle, string filePath)
 			while (getline(colorDim, element, ','))
 			{
 				puzzle->colors[i] = colorHexToRgb(element);
+				i++;
 			}
 			getline(inputFile, line);
 		}
@@ -193,8 +194,8 @@ int main()
 {
 	Puzzle* puzzle = nullptr;
 
-	string inputFiles[] = {/*"5x5rune.txt", 
-		"10x10tree.txt",
+	string inputFiles[] = {//"5x5rune.txt", 
+		/*"10x10tree.txt",
 		"12x12bee.txt",
 		"15x15trivial.txt",
 		"15x15turtle.txt",
@@ -202,8 +203,10 @@ int main()
 		"20x15goldfish.txt",*/
 		//"20x20peacock.txt",
 		//"25x25lion.txt",
-		//"80x80MichaelJackson.txt",
-		"C8x8Mushroom.txt" //
+		//"80x80MichaelJackson.txt",  //Warning!!!
+		"C8x8Mushroom.txt", //
+		"C5x5Target.txt",
+		"C19x13BrazilFlag.txt"
 	};
 	//std::system("pause");
 	
