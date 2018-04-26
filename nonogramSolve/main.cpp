@@ -204,9 +204,13 @@ int main()
 		//"20x20peacock.txt",
 		//"25x25lion.txt",
 		//"80x80MichaelJackson.txt",  //Warning!!!
-		"C8x8Mushroom.txt", //
-		"C5x5Target.txt",
-		"C19x13BrazilFlag.txt"
+		//"C8x8Mushroom.txt", 
+		//"C5x5Target.txt",
+		//"C19x13BrazilFlag.txt",
+		//"C16x25Sakura.txt",
+		//"C18x25Match.txt",
+		"C20x20Ladybug.txt",
+		"C20x20Swan.txt"
 	};
 	//std::system("pause");
 	

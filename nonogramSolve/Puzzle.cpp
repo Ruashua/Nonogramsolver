@@ -71,7 +71,7 @@ void Puzzle::printTheGrid()
 			}
 			else if (theGrid[k][l] >= 1)
 			{
-				cout << char(178 + theGrid[k][l] - 2);
+				cout << char(178 - theGrid[k][l] + 2);
 			}
 		}
 		cout << endl;
@@ -371,13 +371,13 @@ bool Puzzle::bruteForceValidity(int i, int j, bool& tooLong, time_t& startTime)
 				if (!tooLong)
 				{
 					printTheGrid();
-					if (time(0) - startTime > 10)
+					if (time(0) - startTime > PRINTTOOLONG)
 					{
 						tooLong = true;
 						startTime = time(0);
 					}
 				}
-				else if (time(0) - startTime > 2)
+				else if (time(0) - startTime > PRINTTOOLONGINTERVAL)
 				{
 					printTheGrid();
 					startTime = time(0);
