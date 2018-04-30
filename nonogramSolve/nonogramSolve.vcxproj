@@ -112,6 +112,9 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <Media Include="ccccccccmein.cblah">
+      <FileType>CppCode</FileType>
+    </Media>
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Puzzle.cpp" />
     <ClCompile Include="tomograph.cpp" />

@@ -1,93 +1,37 @@
-#include <iostream>
-#include <fstream>
-#include <sstream>
-#include <string>
-#include <ctime>
+#include <stdio.h> //
+//#include <fstream>
+//#include <sstream>
+#include <string.h> //
+#include <time.h>  //
+#include <math.h>
 #include "Puzzle.h"
 #include "Globals.h"
 
-using namespace std;
+char* colorHexToRgb(char hexColor[]);  
 
-string colorHexToRgb(string hexColor);
-void readFile(Puzzle*& puzzle, string filePath);
-void outputPicture(Puzzle* puzzle, string filePath);
-
-int main()
+void readFile(Puzzle* puzzle, char* filePath)
 {
-	Puzzle* puzzle = nullptr;
-
-	string inputFiles[] = {//"80x80MichaelJackson.txt",  //Warning!!!
-		//*
-		"5x5rune.txt", 
-		"10x10tree.txt",
-		"12x12bee.txt",
-		"15x15trivial.txt",
-		"15x15turtle.txt",
-		//"15x20cock.txt",
-		"20x15goldfish.txt",
-		//*/
-		//"20x20peacock.txt",
-		//"25x25lion.txt",
-		"C5x5Target.txt",
-		"C8x8Mushroom.txt", 
-		/*"C19x13BrazilFlag.txt",
-		"C16x25Sakura.txt",
-		"C18x25Match.txt",
-		"C20x20Ladybug.txt",
-		"C20x20Swan.txt"*/
-	};
-	//std::system("pause");
-	
-	for (int i = 0; i < sizeof(inputFiles) / sizeof(inputFiles[0]); i++)
-	{
-		inputFiles[i] = NONOPATH + inputFiles[i];
-		readFile(puzzle, inputFiles[i]);
-		if (DEBUG)
-		{
-			puzzle->tomographyWidth->print();
-			puzzle->tomographyHeight->print();
-		}
-		//puzzle->bruteForce();
-		puzzle->greedy();
-
-		outputPicture(puzzle, inputFiles[i].substr(0, inputFiles[i].size() - 3) + "ppm");
-		cout << inputFiles[i] << endl;
-		delete puzzle;
-	}
-
-	
-
-	std::system("pause");
-	return 0;
-}
-
-string colorHexToRgb(string hexColor)
-{
-	int colorPart;
-	string outColor;
-	stringstream ssColor(hexColor);
-	ssColor >> std::hex >> colorPart;
-	outColor = std::to_string(((colorPart >> 16) & 0xFF));  // Extract the RR byte
-	outColor += " ";
-	outColor += std::to_string(((colorPart >> 8) & 0xFF));   // Extract the GG byte
-	outColor += " ";
-	outColor += std::to_string(((colorPart) & 0xFF));        // Extract the BB byte
-	outColor += " ";
-	return outColor;
-}
-void readFile(Puzzle*& puzzle, string filePath)
-{
-	string line;
-	string element;
-	string color;
-	string value;
-	ifstream inputFile(filePath);
+	char* line[] = "";
+	char element[] = "";
+	char color[] = "";
+	char value[] = "";
 	int w, h, c;
-	string b;
+	char* b = "";
 	int i, j;
+	FILE* inputFile;
 	c = 0;
 	b = DEFAULTBGCOLOR;
+	
 
+	inputFile = fopen(filePath, "r");  //ifstream inputFile(filePath);
+	if (inputFile == NULL)
+	{
+		puts("Trouble opening file");
+	}
+	else
+	{
+
+	}
 	if (inputFile.is_open())
 	{
 		getline(inputFile, line);
@@ -241,4 +185,69 @@ void outputPicture(Puzzle* puzzle, string filePath)
 	{
 		std::cout << "Cannot open file";
 	}
+}
+
+typedef struct Puzzle
+{
+	const int _width;
+	const int _height;
+} Puzzle;
+
+int main()
+{
+	Puzzle* puzzle = NULL;
+
+	char* inputFiles[] = {//"5x5rune.txt", 
+						  /*"10x10tree.txt",
+						  "12x12bee.txt",
+						  "15x15trivial.txt",
+						  "15x15turtle.txt",
+						  //"15x20cock.txt",
+						  "20x15goldfish.txt",*/
+						  //"20x20peacock.txt",
+						  //"25x25lion.txt",
+						  //"80x80MichaelJackson.txt",  //Warning!!!
+		"C5x5Target.txt",
+		"C8x8Mushroom.txt",
+		"C19x13BrazilFlag.txt",
+		"C16x25Sakura.txt",
+		"C18x25Match.txt",
+		"C20x20Ladybug.txt",
+		"C20x20Swan.txt"
+	};
+	//std::system("pause");
+
+	for (int i = 0; i < sizeof(inputFiles) / sizeof(inputFiles[0]); i++)
+	{
+		inputFiles[i] = NONOPATH + inputFiles[i];
+		readFile(puzzle, inputFiles[i]);
+		puzzle->tomographyWidth->print();
+		puzzle->tomographyHeight->print();
+		puzzle->bruteForce();
+
+		outputPicture(puzzle, inputFiles[i].substr(0, inputFiles[i].size() - 3) + "ppm");
+		cout << inputFiles[i] << endl;
+		delete puzzle;
+	}
+
+
+
+	std::system("pause");
+	return 0;
+}
+char* colorHexToRgb(char hexColor[])  //
+{
+	int colorPart;
+	char outColor[] = "";
+	colorPart = (int)strtol(hexColor, NULL, 16);
+	//stringstream ssColor(hexColor);
+	//ssColor >> std::hex >> colorPart;
+	sprintf(outColor, "%i %i %i ", ((colorPart >> 16) & 0xFF), ((colorPart >> 8) & 0xFF), ((colorPart) & 0xFF));
+	/*outColor = std::to_string(((colorPart >> 16) & 0xFF));  // Extract the RR byte
+	outColor += " ";
+	outColor += std::to_string(((colorPart >> 8) & 0xFF));   // Extract the GG byte
+	outColor += " ";
+	outColor += std::to_string(((colorPart) & 0xFF));        // Extract the BB byte
+	outColor += " ";*/
+	return outColor;
 }

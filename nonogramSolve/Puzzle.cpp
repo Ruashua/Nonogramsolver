@@ -1,7 +1,7 @@
 #include "Puzzle.h"
 
 
-Puzzle::Puzzle() :_width(0), _height(0)
+Puzzle::Puzzle() :_width(0), _height(0)	//DO NOT USE
 {
 	tomographyWidth = nullptr;
 	tomographyHeight = nullptr;
@@ -10,7 +10,7 @@ Puzzle::Puzzle() :_width(0), _height(0)
 	bgColor = "255 255 255 ";
 	numberOfColors = 0;
 }
-Puzzle::Puzzle(int w, int h, int c):_width(w), _height(h)
+Puzzle::Puzzle(int w, int h, int c):_width(w), _height(h)	//Initializes the puzzle and arrays with the width, height, and number of colors.  This should really be the only constructor used.
 {
 
 	if (c == 0)
@@ -58,179 +58,25 @@ Puzzle::~Puzzle()
 	delete[] colors;
 }
 
-void Puzzle::printTheGrid()
+void Puzzle::printTheGrid()	//Prints grid to console
 {
 	std::system("cls");
 	for (int l = 0; l < _height; l++)
 	{
 		for (int k = 0; k < _width; k++)
 		{
-			if (theGrid[k][l] == 1)
-			{
-				cout << "X";
-			}
-			else if (theGrid[k][l] >= 1)
-			{
-				cout << char(178 - theGrid[k][l] + 2);
-			}
+			cout<<PRINTCHARS[theGrid[k][l]];
 		}
 		cout << endl;
 	}
 	cout << endl;
 }
-/*
-bool Puzzle::bruteForceValidity(int i, int j, bool& tooLong, time_t& startTime)
+
+bool Puzzle::bruteForceValidity(int i, int j, bool& tooLong, time_t& startTime)	//Returns whether or not the current block is valid with the brute force algorithm
 {
 	int count;
 	int tomographyLocation;
 
-	tomographyLocation = 0;
-	count = 0;
-	for (int k = 0; k < _height; k++)
-	{
-		if (theGrid[i][k] == 2)
-		{
-			count++;
-			if (tomographyLocation > tomographyWidth->sizes[i] - 1)
-			{
-				return false;
-			}
-			else
-			{
-				if (tomographyWidth->tomography[i][tomographyLocation]->number < count)
-				{
-					return false;
-				}
-			}
-		}
-		else
-		{
-			if (tomographyLocation < tomographyWidth->sizes[i])
-			{
-				if (tomographyWidth->tomography[i][tomographyLocation]->number > count && count > 0 && theGrid[i][k] == 1)
-				{
-					return false;
-				}
-				//std::cout << tomographyWidth->tomography[i][tomographyLocation]->number << " " << count << endl;
-				if (tomographyWidth->tomography[i][tomographyLocation]->number == count)
-				{
-					tomographyLocation++;
-					count = 0;
-					if (PRETTYPRINT)
-					{
-						if (!tooLong)
-						{
-							if (j == k)
-							{
-								printTheGrid();
-								if (time(0) - startTime > 10)
-								{
-									tooLong = true;
-									startTime = time(0);
-								}
-							}
-						}
-						else if (time(0) - startTime > 2)
-						{
-							printTheGrid();
-							startTime = time(0);
-						}
-					}
-				}
-			}
-		}
-	}
-	if (j == _height - 1)
-	{
-		if (tomographyLocation < tomographyWidth->sizes[i])
-		{
-			if (tomographyWidth->tomography[i][tomographyLocation]->number != count)
-			{
-				return false;
-			}
-			else if (tomographyLocation < tomographyWidth->sizes[i] - 1)
-			{
-				return false;
-			}
-
-			if (PRETTYPRINT)
-			{
-				if (!tooLong)
-				{
-					printTheGrid();
-					if (time(0) - startTime > 10)
-					{
-						tooLong = true;
-						startTime = time(0);
-					}
-				}
-				else if (time(0) - startTime > 2)
-				{
-					printTheGrid();
-					startTime = time(0);
-				}
-			}
-		}
-	}
-
-
-	tomographyLocation = 0;
-	count = 0;
-	for (int k = 0; k < _width; k++)
-	{
-		if (theGrid[k][j] == 2)
-		{
-			count++;
-			if (tomographyLocation > tomographyHeight->sizes[j] - 1)
-			{
-				return false;
-			}
-			else
-			{
-				if (tomographyHeight->tomography[j][tomographyLocation]->number < count)
-				{
-					return false;
-				}
-			}
-		}
-		else
-		{
-			if (tomographyLocation < tomographyHeight->sizes[j])
-			{
-				if (tomographyHeight->tomography[j][tomographyLocation]->number > count && count > 0 && theGrid[k][j] == 1)
-				{
-					return false;
-				}
-				if (tomographyHeight->tomography[j][tomographyLocation]->number == count)
-				{
-					tomographyLocation++;
-					count = 0;
-				}
-			}
-		}
-	}
-	if (i == _width - 1)
-	{
-		if (tomographyLocation < tomographyHeight->sizes[j])
-		{
-			if (tomographyHeight->tomography[j][tomographyLocation]->number != count)
-			{
-				return false;
-			}
-		}
-
-	}
-	return true;
-}*/
-
-bool Puzzle::bruteForceValidity(int i, int j, bool& tooLong, time_t& startTime)
-{
-	int count;
-	int tomographyLocation;
-	if (i == 0)
-	{
-		i = i;
-	}
 	tomographyLocation = 0;
 	count = 0;
 	for (int k = 0; k < _height; k++)
@@ -434,37 +280,6 @@ bool Puzzle::bruteForceValidity(int i, int j, bool& tooLong, time_t& startTime)
 		{
 			return false;
 		}
-
-		/*if (theGrid[k][j] >= 2 && tomographyHeight->tomography[j][tomographyLocation]->color == theGrid[k][j] - 2)
-		{
-			count++;
-			if (tomographyLocation > tomographyHeight->sizes[j] - 1)
-			{
-				return false;
-			}
-			else
-			{
-				if (tomographyHeight->tomography[j][tomographyLocation]->number < count)
-				{
-					return false;
-				}
-			}
-		}
-		else
-		{
-			if (tomographyLocation < tomographyHeight->sizes[j])
-			{
-				if (tomographyHeight->tomography[j][tomographyLocation]->number > count && count > 0 && theGrid[k][j] == 1)
-				{
-					return false;
-				}
-				if (tomographyHeight->tomography[j][tomographyLocation]->number == count)
-				{
-					tomographyLocation++;
-					count = 0;
-				}
-			}
-		}*/
 	}///*
 	if (i == _width - 1)
 	{
@@ -479,7 +294,7 @@ bool Puzzle::bruteForceValidity(int i, int j, bool& tooLong, time_t& startTime)
 	}//*/
 	return true;
 }
-void Puzzle::bruteForce()
+void Puzzle::bruteForce()	//Solves the puzzle by placing and checking one block at a time starting at the top left, going along the columns.  Very inefficient.
 {
 	int i, j;
 
@@ -559,84 +374,165 @@ void Puzzle::bruteForce()
 	cout << "DONE! ";
 }
 
-
-/*
-void Puzzle::bruteForce()
+bool Puzzle::greedyValidity(int i, int j, bool& tooLong, time_t& startTime)  //TODO?: Check validity for greedy algorithm
 {
-	int i, j;
+	int count;
+	int tomographyLocation;
 
+	tomographyLocation = 0;
+	count = 0;
 
-	bool valid = true;
-	bool needBacktrack = false;
-	i = 0;
+	for (int k = 0; k < _width; k++)
+	{
+		if (theGrid[k][j] != 0 && tomographyLocation < tomographyHeight->sizes[j] && tomographyHeight->tomography[j][tomographyLocation]->number == count && theGrid[k][j] - 1 != tomographyHeight->tomography[j][tomographyLocation]->color)
+		{
+			//The space must be filled, the tomography must not be completed, the filled section must be the length defined in the tomography, and it must have switched to a new color
+			//Then it changes to the next tomography definition
+			tomographyLocation++;
+			count = 0;
+		}
+		if (tomographyLocation >= tomographyHeight->sizes[j]) //What has been filled is valid up to this point
+		{
+			if (theGrid[k][j] == 0) //You have reached the end of what has been filled
+			{
+				break;
+			}
+			if (theGrid[k][j] == 1) //This is a blank square, check the next square
+			{
+				continue;
+			}
+			if (theGrid[k][j] > 1) //But there is another filled space, must be invalid
+			{
+				return false;
+			}
 
+		}
+		if (theGrid[k][j] > 1)  //If the space is filled
+		{
+			if (theGrid[k][j] - 1 == tomographyHeight->tomography[j][tomographyLocation]->color) //count blocks in a row of the same color
+			{
+				count++;
+			}
+			if (tomographyHeight->tomography[j][tomographyLocation]->number < count && theGrid[k][j] - 1 == tomographyHeight->tomography[j][tomographyLocation]->color) //row too long
+			{
+				return false;
+			}
+			if (theGrid[k][j] - 1 != tomographyHeight->tomography[j][tomographyLocation]->color && tomographyHeight->tomography[j][tomographyLocation]->number > count) //row is too small but switched to new color
+			{
+				return false;
+			}
+		}
+		if (theGrid[k][j] == 1 && tomographyHeight->tomography[j][tomographyLocation]->number > count && count > 0) //Prevents breaks with gaps
+		{
+			return false;
+		}
+	}///*
+	if (i == _width - 1)
+	{
+		if (tomographyLocation < tomographyHeight->sizes[j])
+		{
+			if (tomographyHeight->tomography[j][tomographyLocation]->number != count)
+			{
+				return false;
+			}
+		}
+
+	}//*/
+	return true;
+}
+void Puzzle::greedy()	//TODO: Solves puzzle one tomography element at a time.  Meh efficieny.  
+{
+	int i, j, k, l;
+	bool**** dpValidityGrid;  //This is a grid that keeps track of what validity has been evaluated and the validity. 
+	//[width][height][color][0] = hasBeenEvaluated?  
+	//[width][height][color][1] = isValid?
+	//[width][height][0] = blankSpace
+	//[width][height][1] = X'ed
+	//[width][height][>1] = theActualColors
+	dpValidityGrid = new bool***[_width];
+	for (i = 0; i < _width; i++)
+	{
+		dpValidityGrid[i] = new bool**[_width];
+		for (j = 0; j < _height; j++)
+		{
+			dpValidityGrid[i][j] = new bool*[numberOfColors+2];
+			for (k = 0; k < numberOfColors+2; k++)
+			{
+				dpValidityGrid[i][j][k] = new bool[2];
+				dpValidityGrid[i][j][k][0] = false;
+				dpValidityGrid[i][j][k][1] = false;
+			}
+		}
+	}
 	time_t startTime = time(0);
 	bool tooLong = false;
 
+	i = 0;
 	while (i < _width)
 	{
 		j = 0;
-		while (j < _height)
+		k = 0;
+		while (j < _height && k < tomographyWidth->sizes[i])
 		{
-
-
-			if (needBacktrack && theGrid[i][j] == 1)
+			for (l = j; (l - j) < tomographyWidth->tomography[i][k]->number; l++)
 			{
-				theGrid[i][j] = 0;
-				needBacktrack = true;
-
-				j = j - 2;
-			}
-			else
-			{
-				if (valid)
+				theGrid[i][l] = tomographyWidth->tomography[i][k]->color+1;
+				//TODO check if valid, store in valid array
+				if(!dpValidityGrid[i][j][tomographyWidth->tomography[i][k]->color + 1][0])
 				{
-					theGrid[i][j] = 2;
+					dpValidityGrid[i][j][tomographyWidth->tomography[i][k]->color + 1][1] = greedyValidity(i, j, tooLong, startTime);
+					dpValidityGrid[i][j][tomographyWidth->tomography[i][k]->color + 1][0] = true; 
 				}
-				valid = true;
-				if (needBacktrack && theGrid[i][j] == 2)
+				
+				if (!dpValidityGrid[i][j][tomographyWidth->tomography[i][k]->color + 1][1])
 				{
-					theGrid[i][j] = 1;
-					needBacktrack = false;
+					theGrid[i][l] = 1;
+					l++;
+					break;
 				}
 				if (DEBUG)
 				{
 					printTheGrid();
-					//std::system("pause");
-					//
+					std::system("pause");
 				}
-
-				valid = bruteForceValidity(i, j, tooLong, startTime);
-
-				if (!valid)
+			}
+			if (dpValidityGrid[i][j][tomographyWidth->tomography[i][k]->color + 1][1])
+			{
+				j += l - j;
+				k++;
+				if (k < tomographyWidth->sizes[i] && k>0)
 				{
-					if (theGrid[i][j] == 2)
+					if (tomographyWidth->tomography[i][k]->color == tomographyWidth->tomography[i][k - 1]->color)
 					{
-						theGrid[i][j] = 1;
-						j--;
-					}
-					else
-					{
-						theGrid[i][j] = 0;
-						needBacktrack = true;
-						j = j - 2;
+						j++;
 					}
 				}
 			}
-
-			j++;
-			if (j < 0)
+			else
 			{
-				i--;
-				j = _height - 1;
-			}
-			if (i < 0)
-			{
-				cout << "This one is impossible: ";
+				j++;
 			}
 
+			
+			
+			
+		
 		}
 		i++;
 	}
-	cout << "DONE! ";
-}*/
+
+	
+	for (i = 0; i < _width; i++)
+	{
+		for (j = 0; j < _height; j++)
+		{
+			for (k = 0; k < numberOfColors + 2; k++)
+			{
+				delete[] dpValidityGrid[i][j][k];
+			}
+			delete[] dpValidityGrid[i][j];
+		}
+		delete[] dpValidityGrid[i];
+	}
+	delete[] dpValidityGrid;
+}
