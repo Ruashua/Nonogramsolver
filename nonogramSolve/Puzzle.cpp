@@ -392,15 +392,19 @@ int Puzzle::calcNeededRoom(Tomography* tomography, int section, int startPositio
 }
 bool Puzzle::greedyValidity(int i, int j, bool& tooLong, time_t& startTime)  //TODO?: Check validity for greedy algorithm
 {
+	if (i == 2 && j == 4)
+	{
+		cout << "here";
+	}
 	int count;
 	int tomographyLocation;
 
 	tomographyLocation = 0;
 	count = 0;
 
-	for (int k = 0; k < _width; k++)
+	for (int k = 0; k < i+1; k++)
 	{
-		if (theGrid[k][j] != 0 && tomographyLocation < tomographyHeight->sizes[j] && tomographyHeight->tomography[j][tomographyLocation]->number == count && theGrid[k][j] - 1 != tomographyHeight->tomography[j][tomographyLocation]->color)
+		if (tomographyLocation < tomographyHeight->sizes[j] && tomographyHeight->tomography[j][tomographyLocation]->number == count && theGrid[k][j] - 1 != tomographyHeight->tomography[j][tomographyLocation]->color)
 		{
 			//The space must be filled, the tomography must not be completed, the filled section must be the length defined in the tomography, and it must have switched to a new color
 			//Then it changes to the next tomography definition
@@ -410,10 +414,6 @@ bool Puzzle::greedyValidity(int i, int j, bool& tooLong, time_t& startTime)  //T
 		if (tomographyLocation >= tomographyHeight->sizes[j]) //What has been filled is valid up to this point
 		{
 			if (theGrid[k][j] == 0) //You have reached the end of what has been filled
-			{
-				break;
-			}
-			if (theGrid[k][j] == 1) //This is a blank square, check the next square
 			{
 				continue;
 			}
@@ -438,7 +438,7 @@ bool Puzzle::greedyValidity(int i, int j, bool& tooLong, time_t& startTime)  //T
 				return false;
 			}
 		}
-		if (theGrid[k][j] == 1 && tomographyHeight->tomography[j][tomographyLocation]->number > count && count > 0) //Prevents breaks with gaps
+		if (theGrid[k][j] == 0 && tomographyHeight->tomography[j][tomographyLocation]->number > count && count > 0) //Prevents breaks with gaps
 		{
 			return false;
 		}
@@ -456,28 +456,31 @@ bool Puzzle::greedyValidity(int i, int j, bool& tooLong, time_t& startTime)  //T
 	}//*/
 	return true;
 }
+//bool placeGreedySection()
+
 void Puzzle::greedy()	//TODO: Solves puzzle one tomography element at a time.  Meh efficieny.  
 {
-	int i, j, k, l;
+	int i, j, k, l, m, n;
 	bool needCalcRoomNeeded;
 	bool needBacktrack;
 	int roomNeeded;
 	bool**** dpValidityGrid;  //This is a grid that keeps track of what validity has been evaluated and the validity. 
+	bool sectionIsValid;
 	int* tomographyStartPositions;
 	//[width][height][color][0] = hasBeenEvaluated?  
 	//[width][height][color][1] = isValid?
 	//[width][height][0] = blankSpace
 	//[width][height][1] = X'ed
 	//[width][height][>1] = theActualColors
-	short temp=0;
+	short temp = 0;
 	dpValidityGrid = new bool***[_width];
 	for (i = 0; i < _width; i++)
 	{
 		dpValidityGrid[i] = new bool**[_width];
 		for (j = 0; j < _height; j++)
 		{
-			dpValidityGrid[i][j] = new bool*[numberOfColors+2];
-			for (k = 0; k < numberOfColors+2; k++)
+			dpValidityGrid[i][j] = new bool*[numberOfColors + 2];
+			for (k = 0; k < numberOfColors + 2; k++)
 			{
 				dpValidityGrid[i][j][k] = new bool[2];
 				dpValidityGrid[i][j][k][0] = false;
@@ -491,82 +494,252 @@ void Puzzle::greedy()	//TODO: Solves puzzle one tomography element at a time.  M
 	i = 0;
 	while (i < _width)
 	{
-		j = 0;
-		k = 0;
-		needCalcRoomNeeded = true;
-		tomographyStartPositions = new int[tomographyWidth->sizes[i]];
-		while (j < _height && k < tomographyWidth->sizes[i])
+		if (!needBacktrack)
 		{
-			for (l = 0; l < tomographyWidth->tomography[i][k]->number; l++)
+			j = 0;
+			k = 0;
+		}
+		else if (j >= _height)
+		{
+			if (needBacktrack)  //Go to the last section
 			{
-				//cout << (_height - j) << " " << calcNeededRoom(tomographyWidth, i, k);
-				//std::system("pause");
-
-				if (needCalcRoomNeeded)
-				{
-					roomNeeded = calcNeededRoom(tomographyWidth, i, k);
-					needCalcRoomNeeded = false;
+				needCalcRoomNeeded = true;
+				k--;
+				if (k < 0)  //If backtracking passed the first section of the row
+				{ //TODO
+					for (m = 0; m < _height; m++) //delete the row and all of its validity
+					{
+						theGrid[i][m] = 0;
+						for (n = 0; n < numberOfColors + 2; n++)
+						{
+							dpValidityGrid[i][m][n][0] = false;
+							//dpValidityGrid[i][m][n][1] = false;
+						}
+					}
+					i--;
+					k = tomographyWidth->sizes[i] - 1;
+					for (m = tomographyWidth->tomography[i][k]->startPosition; m < tomographyWidth->tomography[i][k]->startPosition + tomographyWidth->tomography[i][k]->number; m++)
+					{
+						theGrid[i][m] = 0;
+					}
+					
 				}
-				if((_height - j) < roomNeeded)	//automatically invalid if there is no more room
+				else
 				{
-					needBacktrack = true;
-					break; //TODO, need backtrack
+					for (m = tomographyWidth->tomography[i][k]->startPosition; m < tomographyWidth->tomography[i][k]->startPosition + tomographyWidth->tomography[i][k]->number; m++)
+					{
+						theGrid[i][m] = 0; //TODO
+					}
 				}
-				theGrid[i][j+l] = short(tomographyWidth->tomography[i][k]->color + 1);
-				//TODO check if valid, store in valid array
-				if(!dpValidityGrid[i][j + l][tomographyWidth->tomography[i][k]->color + 1][0])
-				{
-					dpValidityGrid[i][j + l][tomographyWidth->tomography[i][k]->color + 1][1] = greedyValidity(i, j, tooLong, startTime);
-					dpValidityGrid[i][j + l][tomographyWidth->tomography[i][k]->color + 1][0] = true;
-				}
-				
-				if (!dpValidityGrid[i][j + l][tomographyWidth->tomography[i][k]->color + 1][1])
-				{
-					theGrid[i][j + l] = 1;
-					j++;
-					break;
-				}
+				needBacktrack = false;
 				if (DEBUG)
 				{
 					printTheGrid();
-					std::system("pause");
+					//std::system("pause");
 				}
+			}
+			//j = _height - 1;
+			j = tomographyWidth->tomography[i][k]->startPosition + 1;
+			if (!dpValidityGrid[i][j - 1][0][0])
+			{
+				dpValidityGrid[i][j - 1][0][1] = greedyValidity(i, j - 1, tooLong, startTime);
+				dpValidityGrid[i][j - 1][0][0] = true;
+			}
+			if (!dpValidityGrid[i][j - 1][0][1])
+			{
+				needBacktrack = true;
+				continue;
+			}
+			if (j >= _height)
+			{
+				i--;
+			}
+		}
+		needCalcRoomNeeded = true;
+		//tomographyStartPositions = new int[tomographyWidth->sizes[i]];
+		if (i == 3)
+		{
+			cout << "here";
+		}
+		while (j < _height)
+		{
+			if (theGrid[0][2] == 2 && theGrid[0][4] == 2 && theGrid[1][0] == 0)
+			{
 
 			}
-			if (needBacktrack)
-			{
-				k--;
-				if (k < 0)
-				{ //TODO
-					i -= 2;
-					break;
-				}
-				cout << "here";
 
-			}
-			if (dpValidityGrid[i][j][tomographyWidth->tomography[i][k]->color + 1][1])
+			if (k < tomographyWidth->sizes[i] && !needBacktrack)
 			{
-				j += l - j;
-				k++;
-				needCalcRoomNeeded = true;
-				if (k < tomographyWidth->sizes[i] && k>0)
+				tomographyWidth->tomography[i][k]->startPosition = j;
+				sectionIsValid = true;
+				for (l = 0; l < tomographyWidth->tomography[i][k]->number; l++)  //Loop through the placement of the tomography section
 				{
-					if (tomographyWidth->tomography[i][k]->color == tomographyWidth->tomography[i][k - 1]->color)
+					//cout << (_height - j) << " " << calcNeededRoom(tomographyWidth, i, k);
+					//std::system("pause");
+
+					if (needCalcRoomNeeded) //If the minimum room needed hasnt been calculated, calculate it
 					{
+						roomNeeded = calcNeededRoom(tomographyWidth, i, k);
+						needCalcRoomNeeded = false;
+					}
+					if ((_height - j) < roomNeeded)	//automatically needs to backtrack if there is no more room
+					{
+						needBacktrack = true;
+						break; //TODO, need backtrack
+					}
+					theGrid[i][j + l] = short(tomographyWidth->tomography[i][k]->color + 1);
+					if (DEBUG)
+					{
+						printTheGrid();
+						//std::system("pause");
+					}
+					//TODO check if valid, store in valid array
+					if (!dpValidityGrid[i][j + l][tomographyWidth->tomography[i][k]->color + 1][0])  //If validity of placement hasnt been calculated, calculate it
+					{
+						dpValidityGrid[i][j + l][tomographyWidth->tomography[i][k]->color + 1][1] = greedyValidity(i, j + l, tooLong, startTime);
+						dpValidityGrid[i][j + l][tomographyWidth->tomography[i][k]->color + 1][0] = true;
+					}
+
+					if (!dpValidityGrid[i][j + l][tomographyWidth->tomography[i][k]->color + 1][1])  //If any placement is not valid, undo what was done, increment the starting location by 1 and start again
+					{
+						sectionIsValid = false;
+						for (m = j; m == j + l; m++)
+						{
+							theGrid[i][m] = 0;  //TODO
+							if (!dpValidityGrid[i][m][0][0])
+							{
+								dpValidityGrid[i][m][0][1] = greedyValidity(i, m, tooLong, startTime);
+								dpValidityGrid[i][m][0][0] = true;
+							}
+							if (!dpValidityGrid[i][m][0][1])
+							{
+								needBacktrack = true;
+								break;
+							}
+						}
+
 						j++;
+						break;
+					}
+				}
+				if (!needBacktrack && sectionIsValid)  //If a valid section is done being made, change the loop incrementor
+				{
+					j += l;
+					k++;
+					needCalcRoomNeeded = true;
+					if (k < tomographyWidth->sizes[i])  //If you are not past the last section
+					{
+						if (tomographyWidth->tomography[i][k]->color == tomographyWidth->tomography[i][k - 1]->color)  //If the color of the next section is the same as the last, you need a space
+						{
+							theGrid[i][j] = 0;
+							if (!dpValidityGrid[i][j][0][0])  //Check if that space is valid
+							{
+								dpValidityGrid[i][j][0][1] = greedyValidity(i, j, tooLong, startTime);
+								dpValidityGrid[i][j][0][0] = true;
+							}
+							if (!dpValidityGrid[i][j][0][1]) //if it is not valid, you need to increment the last section
+							{
+								needBacktrack = true;
+							}
+							j++;
+						}
 					}
 				}
 			}
-			else
+			else if (!needBacktrack)
 			{
-				j++;
+				for (l = j; l < _height; l++)  //Validate the spaces after placing every section
+				{
+					if (!dpValidityGrid[i][l][0][0])  //Check if that space is valid
+					{
+						dpValidityGrid[i][l][0][1] = greedyValidity(i, l, tooLong, startTime);
+						dpValidityGrid[i][l][0][0] = true;
+					}
+					if (!dpValidityGrid[i][l][0][1]) //if it is not valid, this is the new starting position for the last section.
+					{
+						needBacktrack = true;
+						j = l - tomographyWidth->tomography[i][k-1]->number + 1;
+						break;
+					}
+					else
+					{
+						j = _height;
+					}
+				}
+				
 			}
+
+			if (needBacktrack)  //Go to the last section
+			{
+				needCalcRoomNeeded = true;
+				k--;
+				if (k < 0)  //If backtracking passed the first section of the row
+				{ //TODO
+					for (m = 0; m < _height; m++) //delete the row and all of its validity
+					{
+						theGrid[i][m] = 0;
+						for (n = 0; n < numberOfColors + 2; n++)
+						{
+							dpValidityGrid[i][m][n][0] = false;
+							//dpValidityGrid[i][m][n][1] = false;
+						}
+					}
+					i--;
+					k = tomographyWidth->sizes[i] - 1;
+					for (m = tomographyWidth->tomography[i][k]->startPosition; m < tomographyWidth->tomography[i][k]->startPosition + tomographyWidth->tomography[i][k]->number; m++)
+					{
+						theGrid[i][m] = 0;
+					}
+					j = tomographyWidth->tomography[i][k]->startPosition + 1;  
+					if (j >= _height)
+					{
+						needBacktrack = true;
+						i--;
+						continue;
+					}
+					if (!dpValidityGrid[i][j - 1][0][0])
+					{
+						dpValidityGrid[i][j - 1][0][1] = greedyValidity(i, j - 1, tooLong, startTime);
+						dpValidityGrid[i][j - 1][0][0] = true;
+					}
+					if (!dpValidityGrid[i][j - 1][0][1])
+					{
+						needBacktrack = true;
+						continue;
+					}
+				}
+				else
+				{
+					for (m = tomographyWidth->tomography[i][k]->startPosition; m < tomographyWidth->tomography[i][k]->startPosition + tomographyWidth->tomography[i][k]->number; m++)
+					{
+						theGrid[i][m] = 0; //TODO
+					}
+				}
+				
+				
+				if (j  < _height)
+				{
+					needBacktrack = false;
+				}
+				else
+				{
+					i--;
+				}
+
+				if (DEBUG)
+				{
+					printTheGrid();
+					//std::system("pause");
+				}
+				continue;
+			}
+			
 		}
-		
+
 		i++;
 	}
 
-	
+
 	for (i = 0; i < _width; i++)
 	{
 		for (j = 0; j < _height; j++)
@@ -581,3 +754,215 @@ void Puzzle::greedy()	//TODO: Solves puzzle one tomography element at a time.  M
 	}
 	delete[] dpValidityGrid;
 }
+
+/*void Puzzle::greedy()	//TODO: Solves puzzle one tomography element at a time.  Meh efficieny.  
+{
+	int i, j, k, l, m, n;
+	bool needCalcRoomNeeded;
+	bool needBacktrack;
+	int roomNeeded;
+	bool**** dpValidityGrid;  //This is a grid that keeps track of what validity has been evaluated and the validity. 
+	int* tomographyStartPositions;
+	//[width][height][color][0] = hasBeenEvaluated?  
+	//[width][height][color][1] = isValid?
+	//[width][height][0] = blankSpace
+	//[width][height][1] = X'ed
+	//[width][height][>1] = theActualColors
+	short temp = 0;
+	dpValidityGrid = new bool***[_width];
+	for (i = 0; i < _width; i++)
+	{
+		dpValidityGrid[i] = new bool**[_width];
+		for (j = 0; j < _height; j++)
+		{
+			dpValidityGrid[i][j] = new bool*[numberOfColors + 2];
+			for (k = 0; k < numberOfColors + 2; k++)
+			{
+				dpValidityGrid[i][j][k] = new bool[2];
+				dpValidityGrid[i][j][k][0] = false;
+				dpValidityGrid[i][j][k][1] = false;
+			}
+		}
+	}
+	time_t startTime = time(0);
+	bool tooLong = false;
+	needBacktrack = false;
+	i = 0;
+	while (i < _width)
+	{
+		if (!needBacktrack)
+		{
+			j = 0;
+			k = 0;
+		}
+		else if (j >= _height)
+		{
+			j = _height - 1;
+		}
+		needCalcRoomNeeded = true;
+		//tomographyStartPositions = new int[tomographyWidth->sizes[i]];
+		if (i == 3)
+		{
+			cout << "here";
+		}
+		while (j < _height && k < tomographyWidth->sizes[i])
+		{
+
+			tomographyWidth->tomography[i][k]->startPosition = j;
+			if (!needBacktrack)
+			{
+				for (l = 0; l < tomographyWidth->tomography[i][k]->number; l++)
+				{
+					//cout << (_height - j) << " " << calcNeededRoom(tomographyWidth, i, k);
+					//std::system("pause");
+
+					if (needCalcRoomNeeded)
+					{
+						roomNeeded = calcNeededRoom(tomographyWidth, i, k);
+						needCalcRoomNeeded = false;
+					}
+					if ((_height - j) < roomNeeded)	//automatically invalid if there is no more room
+					{
+						needBacktrack = true;
+						break; //TODO, need backtrack
+					}
+					theGrid[i][j + l] = short(tomographyWidth->tomography[i][k]->color + 1);
+					if (DEBUG)
+					{
+						printTheGrid();
+						//std::system("pause");
+					}
+					//TODO check if valid, store in valid array
+					if (!dpValidityGrid[i][j + l][tomographyWidth->tomography[i][k]->color + 1][0])
+					{
+						dpValidityGrid[i][j + l][tomographyWidth->tomography[i][k]->color + 1][1] = greedyValidity(i, j + l, tooLong, startTime);
+						dpValidityGrid[i][j + l][tomographyWidth->tomography[i][k]->color + 1][0] = true;
+					}
+
+					if (!dpValidityGrid[i][j + l][tomographyWidth->tomography[i][k]->color + 1][1])
+					{
+						for (m = j; m == j + l; m++)
+						{
+							theGrid[i][m] = 1;  //TODO
+							if (!dpValidityGrid[i][m][1][0])
+							{
+								dpValidityGrid[i][m][1][1] = greedyValidity(i, m, tooLong, startTime);
+								dpValidityGrid[i][m][1][0] = true;
+							}
+							if (!dpValidityGrid[i][m][1][1])
+							{
+								needBacktrack = true;
+							}
+						}
+
+						j++;
+						break;
+					}
+
+
+				}
+			}
+			if (needBacktrack)
+			{
+				needCalcRoomNeeded = true;
+				k--;
+				if (k < 0)
+				{ //TODO
+					for (m = 0; m < _height; m++)
+					{
+						theGrid[i][m] = 0;
+						for (n = 0; n < numberOfColors + 2; n++)
+						{
+							dpValidityGrid[i][m][n][0] = false;
+							dpValidityGrid[i][m][n][1] = false;
+						}
+					}
+					i--;
+					k = tomographyWidth->sizes[i] - 1;
+					for (m = tomographyWidth->tomography[i][k]->startPosition; m < tomographyWidth->tomography[i][k]->startPosition + tomographyWidth->tomography[i][k]->number; m++)
+					{
+						theGrid[i][m] = 0;
+					}
+				}
+				else
+				{
+					for (m = tomographyWidth->tomography[i][k]->startPosition; m < tomographyWidth->tomography[i][k]->startPosition + tomographyWidth->tomography[i][k]->number; m++)
+					{
+						theGrid[i][m] = 0;
+					}
+				}
+				j = tomographyWidth->tomography[i][k]->startPosition + 1;
+				theGrid[i][j - 1] = 1;  //TODO
+				if (!dpValidityGrid[i][j - 1][1][0])
+				{
+					dpValidityGrid[i][j - 1][1][1] = greedyValidity(i, j - 1, tooLong, startTime);
+					dpValidityGrid[i][j - 1][1][0] = true;
+				}
+				if (!dpValidityGrid[i][j - 1][1][1])
+				{
+					needBacktrack = true;
+					continue;
+				}
+				if (j < _height)
+				{
+					needBacktrack = false;
+				}
+				else
+				{
+					i--;
+				}
+
+				if (DEBUG)
+				{
+					printTheGrid();
+					//std::system("pause");
+				}
+				continue;
+			}
+			if (dpValidityGrid[i][j][tomographyWidth->tomography[i][k]->color + 1][1])
+			{
+				j += l;
+				k++;
+				needCalcRoomNeeded = true;
+				if (k < tomographyWidth->sizes[i] && k>0)
+				{
+					if (tomographyWidth->tomography[i][k]->color == tomographyWidth->tomography[i][k - 1]->color)
+					{
+						theGrid[i][j] = 1;
+						if (!dpValidityGrid[i][j][1][0])
+						{
+							dpValidityGrid[i][j][1][1] = greedyValidity(i, j, tooLong, startTime);
+							dpValidityGrid[i][j][1][0] = true;
+						}
+						if (!dpValidityGrid[i][j][1][1])
+						{
+							needBacktrack = true;
+						}
+						j++;
+					}
+				}
+			}
+			else
+			{
+				j++;
+			}
+		}
+
+		i++;
+	}
+
+
+	for (i = 0; i < _width; i++)
+	{
+		for (j = 0; j < _height; j++)
+		{
+			for (k = 0; k < numberOfColors + 2; k++)
+			{
+				delete[] dpValidityGrid[i][j][k];
+			}
+			delete[] dpValidityGrid[i][j];
+		}
+		delete[] dpValidityGrid[i];
+	}
+	delete[] dpValidityGrid;
+}*/
