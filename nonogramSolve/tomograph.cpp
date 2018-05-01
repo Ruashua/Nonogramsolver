@@ -1,6 +1,6 @@
 #include "Tomograph.h"
 
-Tomograph::Tomograph(int n, int c)
+Tomograph::Tomograph(int n, short c)
 {
 	number = n;
 	color = c;

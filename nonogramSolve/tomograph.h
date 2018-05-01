@@ -3,10 +3,10 @@ class Tomograph
 {
 public:
 	int number;
-	int color;
+	short color;
 	bool finished;
 
-	Tomograph(int n, int c);
+	Tomograph(int n, short c);
 	Tomograph();
 	~Tomograph();
 };

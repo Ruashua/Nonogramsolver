@@ -148,7 +148,7 @@ void readFile(Puzzle*& puzzle, string filePath)
 						istringstream colorDim(element);
 						getline(colorDim, value, '|');
 						getline(colorDim, color, '|');
-						puzzle->tomographyWidth->tomography[i][j] = new Tomograph(stoi(value), stoi(color));
+						puzzle->tomographyWidth->tomography[i][j] = new Tomograph(stoi(value), (short)stoi(color));
 					}
 					else
 					{
@@ -181,7 +181,7 @@ void readFile(Puzzle*& puzzle, string filePath)
 						istringstream colorDim(element);
 						getline(colorDim, value, '|');
 						getline(colorDim, color, '|');
-						puzzle->tomographyHeight->tomography[i][j] = new Tomograph(stoi(value), stoi(color));
+						puzzle->tomographyHeight->tomography[i][j] = new Tomograph(stoi(value), (short)stoi(color));
 					}
 					else
 					{

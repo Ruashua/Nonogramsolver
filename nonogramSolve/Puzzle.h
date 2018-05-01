@@ -35,6 +35,7 @@ public:
 	bool bruteForceValidity(int i, int j, bool& tooLong, time_t& startTime);	//Returns whether or not the current block is valid with the brute force algorithm
 	void bruteForce();	//Solves the puzzle by placing and checking one block at a time starting at the top left, going along the columns.  Very inefficient.
 
+	int Puzzle::calcNeededRoom(Tomography* tomography, int section, int startPosition);
 	bool Puzzle::greedyValidity(int i, int j, bool& tooLong, time_t& startTime);
 	void Puzzle::greedy();	//Solves puzzle one tomography element at a time.  Meh efficieny.  
 };

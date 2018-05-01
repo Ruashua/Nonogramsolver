@@ -374,6 +374,22 @@ void Puzzle::bruteForce()	//Solves the puzzle by placing and checking one block 
 	cout << "DONE! ";
 }
 
+int Puzzle::calcNeededRoom(Tomography* tomography, int section, int startPosition)
+{
+	int total = 0;
+	for (int i = startPosition; i < tomography->sizes[section]; i++)
+	{
+		total += tomography->tomography[section][i]->number;
+		if (i != startPosition)
+		{
+			if (tomography->tomography[section][i]->color == tomography->tomography[section][i - 1]->color)
+			{
+				total++;
+			}
+		}
+	}
+	return total;
+}
 bool Puzzle::greedyValidity(int i, int j, bool& tooLong, time_t& startTime)  //TODO?: Check validity for greedy algorithm
 {
 	int count;
@@ -443,12 +459,17 @@ bool Puzzle::greedyValidity(int i, int j, bool& tooLong, time_t& startTime)  //T
 void Puzzle::greedy()	//TODO: Solves puzzle one tomography element at a time.  Meh efficieny.  
 {
 	int i, j, k, l;
+	bool needCalcRoomNeeded;
+	bool needBacktrack;
+	int roomNeeded;
 	bool**** dpValidityGrid;  //This is a grid that keeps track of what validity has been evaluated and the validity. 
+	int* tomographyStartPositions;
 	//[width][height][color][0] = hasBeenEvaluated?  
 	//[width][height][color][1] = isValid?
 	//[width][height][0] = blankSpace
 	//[width][height][1] = X'ed
 	//[width][height][>1] = theActualColors
+	short temp=0;
 	dpValidityGrid = new bool***[_width];
 	for (i = 0; i < _width; i++)
 	{
@@ -466,28 +487,43 @@ void Puzzle::greedy()	//TODO: Solves puzzle one tomography element at a time.  M
 	}
 	time_t startTime = time(0);
 	bool tooLong = false;
-
+	needBacktrack = false;
 	i = 0;
 	while (i < _width)
 	{
 		j = 0;
 		k = 0;
+		needCalcRoomNeeded = true;
+		tomographyStartPositions = new int[tomographyWidth->sizes[i]];
 		while (j < _height && k < tomographyWidth->sizes[i])
 		{
-			for (l = j; (l - j) < tomographyWidth->tomography[i][k]->number; l++)
+			for (l = 0; l < tomographyWidth->tomography[i][k]->number; l++)
 			{
-				theGrid[i][l] = tomographyWidth->tomography[i][k]->color+1;
-				//TODO check if valid, store in valid array
-				if(!dpValidityGrid[i][j][tomographyWidth->tomography[i][k]->color + 1][0])
+				//cout << (_height - j) << " " << calcNeededRoom(tomographyWidth, i, k);
+				//std::system("pause");
+
+				if (needCalcRoomNeeded)
 				{
-					dpValidityGrid[i][j][tomographyWidth->tomography[i][k]->color + 1][1] = greedyValidity(i, j, tooLong, startTime);
-					dpValidityGrid[i][j][tomographyWidth->tomography[i][k]->color + 1][0] = true; 
+					roomNeeded = calcNeededRoom(tomographyWidth, i, k);
+					needCalcRoomNeeded = false;
+				}
+				if((_height - j) < roomNeeded)	//automatically invalid if there is no more room
+				{
+					needBacktrack = true;
+					break; //TODO, need backtrack
+				}
+				theGrid[i][j+l] = short(tomographyWidth->tomography[i][k]->color + 1);
+				//TODO check if valid, store in valid array
+				if(!dpValidityGrid[i][j + l][tomographyWidth->tomography[i][k]->color + 1][0])
+				{
+					dpValidityGrid[i][j + l][tomographyWidth->tomography[i][k]->color + 1][1] = greedyValidity(i, j, tooLong, startTime);
+					dpValidityGrid[i][j + l][tomographyWidth->tomography[i][k]->color + 1][0] = true;
 				}
 				
-				if (!dpValidityGrid[i][j][tomographyWidth->tomography[i][k]->color + 1][1])
+				if (!dpValidityGrid[i][j + l][tomographyWidth->tomography[i][k]->color + 1][1])
 				{
-					theGrid[i][l] = 1;
-					l++;
+					theGrid[i][j + l] = 1;
+					j++;
 					break;
 				}
 				if (DEBUG)
@@ -495,11 +531,24 @@ void Puzzle::greedy()	//TODO: Solves puzzle one tomography element at a time.  M
 					printTheGrid();
 					std::system("pause");
 				}
+
+			}
+			if (needBacktrack)
+			{
+				k--;
+				if (k < 0)
+				{ //TODO
+					i -= 2;
+					break;
+				}
+				cout << "here";
+
 			}
 			if (dpValidityGrid[i][j][tomographyWidth->tomography[i][k]->color + 1][1])
 			{
 				j += l - j;
 				k++;
+				needCalcRoomNeeded = true;
 				if (k < tomographyWidth->sizes[i] && k>0)
 				{
 					if (tomographyWidth->tomography[i][k]->color == tomographyWidth->tomography[i][k - 1]->color)
@@ -512,12 +561,8 @@ void Puzzle::greedy()	//TODO: Solves puzzle one tomography element at a time.  M
 			{
 				j++;
 			}
-
-			
-			
-			
-		
 		}
+		
 		i++;
 	}
 
