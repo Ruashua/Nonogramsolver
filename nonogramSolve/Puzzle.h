@@ -37,6 +37,7 @@ public:
 
 	int Puzzle::calcNeededRoom(Tomography* tomography, int section, int startPosition);
 	bool Puzzle::greedyValidity(int i, int j, bool& tooLong, time_t& startTime);
+	bool Puzzle::greedyValidityFront(bool****& dpValidityGrid, int i, int j, int c, bool& tooLong, time_t& startTime);
 	void Puzzle::greedy();	//Solves puzzle one tomography element at a time.  Meh efficieny.  
 };
 

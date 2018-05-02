@@ -456,9 +456,101 @@ bool Puzzle::greedyValidity(int i, int j, bool& tooLong, time_t& startTime)  //T
 	}//*/
 	return true;
 }
+bool Puzzle::greedyValidityFront(bool****& dpValidityGrid, int i, int j, int c, bool& tooLong, time_t& startTime)
+{
+	if (!dpValidityGrid[i][j][c][0])  //If validity of placement hasnt been calculated, calculate it
+	{
+		dpValidityGrid[i][j][c][1] = greedyValidity(i, j, tooLong, startTime);
+		dpValidityGrid[i][j][c][0] = true;
+	}
+	return dpValidityGrid[i][j][c][1];
+}
 //bool placeGreedySection()
 
-void Puzzle::greedy()	//TODO: Solves puzzle one tomography element at a time.  Meh efficieny.  
+void Puzzle::greedy()  //OK....redo.... make it less efficient but more organized.
+{
+	int i, j, k, l, m, n; //counters
+	bool needLoopThroughSections, needLoopThroughColumns, needToMakeSpaces, needCalcRoomNeeded, needBacktrack;
+	int roomNeeded;
+	int backTrackUndoAmount;
+	time_t startTime = time(0);
+	bool tooLong = false;
+
+	bool**** dpValidityGrid;
+	for (i = 0; i < _width; i++)
+	{
+		dpValidityGrid[i] = new bool**[_width];
+		for (j = 0; j < _height; j++)
+		{
+			dpValidityGrid[i][j] = new bool*[numberOfColors + 1];
+			for (k = 0; k < numberOfColors + 1; k++)
+			{
+				dpValidityGrid[i][j][k] = new bool[2];
+				dpValidityGrid[i][j][k][0] = false;
+				dpValidityGrid[i][j][k][1] = false;
+			}
+		}
+	}
+
+	i = 0;
+	k = 0;
+	needLoopThroughSections = true; 
+	needLoopThroughColumns = true;
+	needToMakeSpaces = false;
+	while (needLoopThroughColumns)
+	{
+		//while (j<_height) //TODO loop through the height
+		{
+			j = 0;
+			while (needLoopThroughSections) //TODO loop through sections/spaces
+			{
+				if (needToMakeSpaces)
+				{
+
+				}
+				else
+				{
+					if (needCalcRoomNeeded) //If the minimum room needed hasnt been calculated, calculate it
+					{
+						roomNeeded = calcNeededRoom(tomographyWidth, i, k);
+						needCalcRoomNeeded = false;
+					}
+					if ((_height - j) < roomNeeded)	//automatically needs to backtrack if there is no more room
+					{
+						needBacktrack = true;
+						break; //TODO, need backtrack
+					}
+					j = tomographyWidth->tomography[i][k]->startPosition;
+					for (l = j; l < tomographyWidth->tomography[i][k]->number + j; l++)  //Loop through the placement of the tomography section
+					{
+						theGrid[i][j] = short(tomographyWidth->tomography[i][k]->color);
+						
+						needBacktrack = greedyValidityFront(dpValidityGrid, i, l, tomographyWidth->tomography[i][k]->color, tooLong, startTime);
+
+					}
+				}
+
+			}
+		}
+	}
+
+
+	for (i = 0; i < _width; i++)
+	{
+		for (j = 0; j < _height; j++)
+		{
+			for (k = 0; k < numberOfColors + 1; k++)
+			{
+				delete[] dpValidityGrid[i][j][k];
+			}
+			delete[] dpValidityGrid[i][j];
+		}
+		delete[] dpValidityGrid[i];
+	}
+	delete[] dpValidityGrid;
+}
+
+/*void Puzzle::greedy()	//TODO: Solves puzzle one tomography element at a time.  Meh efficieny.  
 {
 	int i, j, k, l, m, n;
 	bool needCalcRoomNeeded;
@@ -753,7 +845,7 @@ void Puzzle::greedy()	//TODO: Solves puzzle one tomography element at a time.  M
 		delete[] dpValidityGrid[i];
 	}
 	delete[] dpValidityGrid;
-}
+}*/
 
 /*void Puzzle::greedy()	//TODO: Solves puzzle one tomography element at a time.  Meh efficieny.  
 {
