@@ -30,14 +30,15 @@ public:
 	Puzzle(int w, int h, int c);	//Initializes the puzzle and arrays with the width, height, and number of colors.  This should really be the only constructor used.
 	~Puzzle();
 
+	void Puzzle::printTheGrid(int column); //Prints grid to console up to a column
 	void printTheGrid();	//Prints grid to console
 
 	bool bruteForceValidity(int i, int j, bool& tooLong, time_t& startTime);	//Returns whether or not the current block is valid with the brute force algorithm
 	void bruteForce();	//Solves the puzzle by placing and checking one block at a time starting at the top left, going along the columns.  Very inefficient.
 
 	int Puzzle::calcNeededRoom(Tomography* tomography, int section, int startPosition);
-	bool Puzzle::greedyValidity(int i, int j, bool& tooLong, time_t& startTime);
-	bool Puzzle::greedyValidityFront(bool****& dpValidityGrid, int i, int j, int c, bool& tooLong, time_t& startTime);
+	bool Puzzle::greedyValidity(int i, int j);
+	bool Puzzle::greedyValidityFront(bool****& dpValidityGrid, int i, int j, int c);
 	void Puzzle::greedy();	//Solves puzzle one tomography element at a time.  Meh efficieny.  
 };
 

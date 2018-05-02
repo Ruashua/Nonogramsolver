@@ -3,10 +3,12 @@
 #include <sstream>
 #include <string>
 #include <ctime>
+#include <chrono>
 #include "Puzzle.h"
 #include "Globals.h"
 
 using namespace std;
+using namespace std::chrono;
 
 string colorHexToRgb(string hexColor);
 void readFile(Puzzle*& puzzle, string filePath);
@@ -16,46 +18,111 @@ int main()
 {
 	Puzzle* puzzle = nullptr;
 
-	string inputFiles[] = {//"80x80MichaelJackson.txt",  //Warning!!!
+	string inputFiles[] = {
 		//*
-		//"5x5rune.txt", 
+		"5x5rune.txt", 
 		"10x10tree.txt",
 		"12x12bee.txt",
 		"15x15trivial.txt",
 		"15x15turtle.txt",
-		//"15x20cock.txt",
+		"15x20cock.txt",
 		"20x15goldfish.txt",
-		//*/
-		//"20x20peacock.txt",
-		//"25x25lion.txt",
+		"20x20peacock.txt",
+		"25x25lion.txt",
 		"C5x5Target.txt",
 		"C8x8Mushroom.txt", 
-		/*"C19x13BrazilFlag.txt",
+		"C19x13BrazilFlag.txt",
 		"C16x25Sakura.txt",
 		"C18x25Match.txt",
 		"C20x20Ladybug.txt",
-		"C20x20Swan.txt"*/
+		"C20x20Swan.txt" //*/
+		//"80x80MichaelJackson.txt",  //Warning!!!
 	};
 	//std::system("pause");
-	
+
+#ifdef GETEXECUTIONTIME
+	int algorithmCounter;
+	microseconds microTime;
+	unsigned long long** executionTime;
+	executionTime = new unsigned long long*[sizeof(inputFiles) / sizeof(inputFiles[0])];
 	for (int i = 0; i < sizeof(inputFiles) / sizeof(inputFiles[0]); i++)
 	{
-		inputFiles[i] = NONOPATH + inputFiles[i];
-		readFile(puzzle, inputFiles[i]);
-		if (DEBUG)
-		{
-			puzzle->tomographyWidth->print();
-			puzzle->tomographyHeight->print();
-		}
-		//puzzle->bruteForce();
+		executionTime[i] = new unsigned long long[NUMBEROFALGORITHMS];
+	}
+#endif //GETEXECUTIONTIME
+
+	for (int i = 0; i < sizeof(inputFiles) / sizeof(inputFiles[0]); i++)
+	{
+
+#ifdef GETEXECUTIONTIME
+		algorithmCounter = 0;
+#endif //GETEXECUTIONTIME
+
+		readFile(puzzle, NONOPATH + inputFiles[i]);
+
+#ifdef DEBUG
+		puzzle->tomographyWidth->print();
+		cout << endl;
+		puzzle->tomographyHeight->print();
+#endif //DEBUG
+
+#ifdef GETEXECUTIONTIME
+		microTime = duration_cast< microseconds >(
+			system_clock::now().time_since_epoch()
+			);
+		executionTime[i][algorithmCounter] = microTime.count();
+#endif //GETEXECUTIONTIME
+
+		puzzle->bruteForce();
+
+#ifdef GETEXECUTIONTIME
+		microTime = duration_cast< microseconds >(
+			system_clock::now().time_since_epoch()
+			);
+		executionTime[i][algorithmCounter] = microTime.count() - executionTime[i][algorithmCounter];
+		algorithmCounter++;
+#endif //GETEXECUTIONTIME
+#ifdef GETEXECUTIONTIME
+		microTime = duration_cast< microseconds >(
+			system_clock::now().time_since_epoch()
+			);
+		executionTime[i][algorithmCounter] = microTime.count();
+#endif //GETEXECUTIONTIME
+
 		puzzle->greedy();
 
-		outputPicture(puzzle, inputFiles[i].substr(0, inputFiles[i].size() - 3) + "ppm");
-		cout << inputFiles[i] << endl;
+#ifdef GETEXECUTIONTIME
+		microTime = duration_cast< microseconds >(
+			system_clock::now().time_since_epoch()
+			);
+		executionTime[i][algorithmCounter] = microTime.count() - executionTime[i][algorithmCounter];
+		algorithmCounter++;
+#endif //GETEXECUTIONTIME
+
+		outputPicture(puzzle, NONOPATH + inputFiles[i].substr(0, inputFiles[i].size() - 3) + "ppm");
+		cout << NONOPATH + inputFiles[i] << endl;
 		delete puzzle;
 	}
 
-	
+#ifdef GETEXECUTIONTIME
+	std::system("cls");
+	for (int i = 0; i < sizeof(inputFiles) / sizeof(inputFiles[0]); i++)
+	{
+		cout << inputFiles[i] << ":   ";
+		for (int j = 0; j < NUMBEROFALGORITHMS; j++)
+		{
+			cout << j << ": " << executionTime[i][j] << char(230)<< "s  ";
+		}
+		cout << endl;
+	}
+
+	for (int i = 0; i < sizeof(inputFiles) / sizeof(inputFiles[0]); i++)
+	{
+		delete[] executionTime[i];
+	}
+	delete executionTime;
+#endif //GETEXECUTIONTIME
+
 
 	std::system("pause");
 	return 0;
