@@ -1,14 +1,18 @@
+#include "Globals.h"
 #include <iostream>
 #include <fstream>
 #include <sstream>
-#include <string>
 #include <ctime>
+#ifdef GETEXECUTIONTIME
 #include <chrono>
+#endif //GETEXECUTIONTIME
 #include "Puzzle.h"
-#include "Globals.h"
+
 
 using namespace std;
+#ifdef GETEXECUTIONTIME
 using namespace std::chrono;
+#endif //GETEXECUTIONTIME
 
 string colorHexToRgb(string hexColor);
 void readFile(Puzzle*& puzzle, string filePath);
@@ -17,17 +21,19 @@ void outputPicture(Puzzle* puzzle, string filePath);
 int main()
 {
 	Puzzle* puzzle = nullptr;
+	
 
 	string inputFiles[] = {
-		//*
-		"5x5rune.txt", 
-		"10x10tree.txt",
-		"12x12bee.txt",
-		"15x15trivial.txt",
-		"15x15turtle.txt",
-		"15x20cock.txt",
+		
+		//"5x5rune.txt", 
+		//"10x10tree.txt",
+		//"12x12bee.txt",
+		//"15x15trivial.txt",
+		//"15x15turtle.txt",
+		//"15x20cock.txt",
+		//"19x19-9-dom.txt",
 		"20x15goldfish.txt",
-		"20x20peacock.txt",
+		/*//"20x20peacock.txt",
 		"25x25lion.txt",
 		"C5x5Target.txt",
 		"C8x8Mushroom.txt", 
@@ -36,18 +42,32 @@ int main()
 		"C18x25Match.txt",
 		"C20x20Ladybug.txt",
 		"C20x20Swan.txt" //*/
+		//"47x40Sierp(VeryHard).txt",  //Warning!!!
 		//"80x80MichaelJackson.txt",  //Warning!!!
 	};
+
+
+
+
 	//std::system("pause");
 
 #ifdef GETEXECUTIONTIME
+	int numberOfAlgorithms;
+	numberOfAlgorithms = 0;
+#ifdef RUNBRUTEFORCE
+	numberOfAlgorithms++;
+#endif // RUNBRUTEFORCE
+#ifdef RUNGREEDY
+	numberOfAlgorithms++;
+#endif // RUNGREEDY
+
 	int algorithmCounter;
 	microseconds microTime;
 	unsigned long long** executionTime;
 	executionTime = new unsigned long long*[sizeof(inputFiles) / sizeof(inputFiles[0])];
 	for (int i = 0; i < sizeof(inputFiles) / sizeof(inputFiles[0]); i++)
 	{
-		executionTime[i] = new unsigned long long[NUMBEROFALGORITHMS];
+		executionTime[i] = new unsigned long long[numberOfAlgorithms];
 	}
 #endif //GETEXECUTIONTIME
 
@@ -59,13 +79,18 @@ int main()
 #endif //GETEXECUTIONTIME
 
 		readFile(puzzle, NONOPATH + inputFiles[i]);
+		//puzzle->transposePuzzle();
+		puzzle->mirrorPuzzle(puzzle->tomographyWidth, puzzle->tomographyHeight);
 
 #ifdef DEBUG
 		puzzle->tomographyWidth->print();
 		cout << endl;
 		puzzle->tomographyHeight->print();
+		system("pause");
 #endif //DEBUG
 
+#ifdef RUNBRUTEFORCE
+		puzzle->zeroTheGrid();
 #ifdef GETEXECUTIONTIME
 		microTime = duration_cast< microseconds >(
 			system_clock::now().time_since_epoch()
@@ -82,6 +107,10 @@ int main()
 		executionTime[i][algorithmCounter] = microTime.count() - executionTime[i][algorithmCounter];
 		algorithmCounter++;
 #endif //GETEXECUTIONTIME
+#endif // RUNBRUTEFORCE
+
+#ifdef RUNGREEDY
+		puzzle->zeroTheGrid();
 #ifdef GETEXECUTIONTIME
 		microTime = duration_cast< microseconds >(
 			system_clock::now().time_since_epoch()
@@ -98,6 +127,27 @@ int main()
 		executionTime[i][algorithmCounter] = microTime.count() - executionTime[i][algorithmCounter];
 		algorithmCounter++;
 #endif //GETEXECUTIONTIME
+#endif // RUNGREEDY
+
+#ifdef RUNLIKEHUMAN
+		puzzle->zeroTheGrid();
+#ifdef GETEXECUTIONTIME
+		microTime = duration_cast< microseconds >(
+			system_clock::now().time_since_epoch()
+			);
+		executionTime[i][algorithmCounter] = microTime.count();
+#endif //GETEXECUTIONTIME
+
+		puzzle->greedy();
+
+#ifdef GETEXECUTIONTIME
+		microTime = duration_cast< microseconds >(
+			system_clock::now().time_since_epoch()
+			);
+		executionTime[i][algorithmCounter] = microTime.count() - executionTime[i][algorithmCounter];
+		algorithmCounter++;
+#endif //GETEXECUTIONTIME
+#endif // RUNLIKEHUMAN
 
 		outputPicture(puzzle, NONOPATH + inputFiles[i].substr(0, inputFiles[i].size() - 3) + "ppm");
 		cout << NONOPATH + inputFiles[i] << endl;
@@ -109,7 +159,7 @@ int main()
 	for (int i = 0; i < sizeof(inputFiles) / sizeof(inputFiles[0]); i++)
 	{
 		cout << inputFiles[i] << ":   ";
-		for (int j = 0; j < NUMBEROFALGORITHMS; j++)
+		for (int j = 0; j < numberOfAlgorithms; j++)
 		{
 			cout << j << ": " << executionTime[i][j] << char(230)<< "s  ";
 		}

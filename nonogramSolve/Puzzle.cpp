@@ -58,6 +58,17 @@ Puzzle::~Puzzle()
 	delete[] colors;
 }
 
+void Puzzle::zeroTheGrid()
+{
+	for (int l = 0; l < _height; l++)
+	{
+		for (int k = 0; k < _width; k++)
+		{
+			theGrid[k][l] = 0;
+		}
+	}
+}
+
 void Puzzle::printTheGrid(int column)	//Prints grid to console up to a column
 {
 	std::system("cls");
@@ -84,6 +95,67 @@ void Puzzle::printTheGrid()	//Prints grid to console
 		cout << endl;
 	}
 	cout << endl;
+}
+
+void Puzzle::transposePuzzle()  //Swaps width and height (resets theGrid to zero)
+{
+	Tomography* t;
+	t = tomographyHeight;
+	tomographyHeight = tomographyWidth;
+	tomographyWidth = t;
+
+	for (int i = 0; i < _width; i++)
+	{
+		delete[] theGrid[i];
+	}
+	delete[] theGrid;
+
+	int i;
+	i = _width;
+	_width = _height;
+	_height = i;
+
+	theGrid = new short*[_width];
+	for (int i = 0; i < _width; i++)
+	{
+		theGrid[i] = new short[_height];
+	}
+	zeroTheGrid();
+}
+
+void Puzzle::mirrorPuzzle(Tomography*& tomographyMirrorAxis, Tomography*& tomographyOtherAxis)  //Mirrors puzzle over an axis. So if width is first variable, it mirrors the width.
+{
+	Tomography* mirrorAxis = new Tomography(tomographyMirrorAxis->dimensionSize);
+	Tomography* otherAxis = new Tomography(tomographyOtherAxis->dimensionSize);
+
+	for (int i = tomographyMirrorAxis->dimensionSize - 1; i >= 0; i--)
+	{
+		mirrorAxis->sizes[tomographyMirrorAxis->dimensionSize - 1 - i] = tomographyMirrorAxis->sizes[i];
+		mirrorAxis->tomography[tomographyMirrorAxis->dimensionSize - 1 - i] = new Tomograph*[tomographyMirrorAxis->sizes[i]];
+		for (int j = 0; j < tomographyMirrorAxis->sizes[i]; j++)
+		{
+			mirrorAxis->tomography[tomographyMirrorAxis->dimensionSize - 1 - i][j] = new Tomograph(tomographyMirrorAxis->tomography[i][j]->number, tomographyMirrorAxis->tomography[i][j]->color);
+			
+		}
+	}
+
+	delete tomographyMirrorAxis;
+	tomographyMirrorAxis = mirrorAxis;
+
+	for (int i = 0; i < tomographyOtherAxis->dimensionSize; i++)
+	{
+		otherAxis->sizes[i] = tomographyOtherAxis->sizes[i];
+		otherAxis->tomography[i] = new Tomograph*[tomographyOtherAxis->sizes[i]];
+		for (int j = tomographyOtherAxis->sizes[i] - 1; j >=0; j--)
+		{
+			otherAxis->tomography[i][tomographyOtherAxis->sizes[i] - 1 - j] = new Tomograph(tomographyOtherAxis->tomography[i][j]->number, tomographyOtherAxis->tomography[i][j]->color);
+		}
+	}
+
+	delete tomographyOtherAxis;
+	tomographyOtherAxis = otherAxis;
+
+	tomographyWidth->print();
 }
 
 bool Puzzle::bruteForceValidity(int i, int j, bool& tooLong, time_t& startTime)	//Returns whether or not the current block is valid with the brute force algorithm
@@ -471,7 +543,6 @@ bool Puzzle::greedyValidityFront(bool****& dpValidityGrid, int i, int j, int c)
 	}
 	return !dpValidityGrid[i][j][c][1];
 }
-//bool placeGreedySection()
 
 void Puzzle::greedy()  //OK....redo.... make it less efficient but more organized.
 {
@@ -695,4 +766,14 @@ void Puzzle::greedy()  //OK....redo.... make it less efficient but more organize
 		delete[] dpValidityGrid[i];
 	}
 	delete[] dpValidityGrid;
+}
+
+void Puzzle::placeTrivial()  //TODO
+{
+
+}
+
+void Puzzle::likeHuman()  //TODO
+{
+
 }
