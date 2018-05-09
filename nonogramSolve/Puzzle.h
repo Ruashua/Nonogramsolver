@@ -35,7 +35,7 @@ public:
 	void printTheGrid();	//Prints grid to console
 	void Puzzle::transposePuzzle();  //Swaps width and height (resets theGrid to zero)
 	void Puzzle::mirrorPuzzle(Tomography*& tomographyMirrorAxis, Tomography*& tomographyOtherAxis);  //Mirrors puzzle over an axis. So if width is first variable, it mirrors the width.
-
+	void Puzzle::transOrMirrorForParallel(int number);
 
 	bool bruteForceValidity(int i, int j, bool& tooLong, time_t& startTime);	//Returns whether or not the current block is valid with the brute force algorithm
 	void bruteForce();	//Solves the puzzle by placing and checking one block at a time starting at the top left, going along the columns.  Very inefficient.
@@ -44,7 +44,7 @@ public:
 
 	bool Puzzle::greedyValidity(int i, int j);
 	bool Puzzle::greedyValidityFront(bool****& dpValidityGrid, int i, int j, int c);
-	void Puzzle::greedy();	//Solves puzzle one tomography element at a time.  Meh efficieny.  
+	bool Puzzle::greedy();	//Solves puzzle one tomography element at a time.  Meh efficieny.  Returns if it finished (parallel only)
 
 	void Puzzle::placeTrivial();
 	void Puzzle::likeHuman();

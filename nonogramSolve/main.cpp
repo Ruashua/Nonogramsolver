@@ -6,7 +6,11 @@
 #ifdef GETEXECUTIONTIME
 #include <chrono>
 #endif //GETEXECUTIONTIME
+#ifdef PARALLEL
+#include <omp.h>
+#endif //PARALLEL
 #include "Puzzle.h"
+
 
 
 using namespace std;
@@ -118,7 +122,27 @@ int main()
 		executionTime[i][algorithmCounter] = microTime.count();
 #endif //GETEXECUTIONTIME
 
+#ifdef PARALLEL
+		RACENOTFINISHED = true;
+#pragma omp parallel num_threads(8)
+		{
+			bool finished = false;
+			Puzzle* localPuzzle = new Puzzle(puzzle);
+			localPuzzle->transOrMirrorForParallel(omp_get_thread_num());
+			finished = localPuzzle->greedy();
+
+			if (finished)
+			{
+#pragma omp critical
+				{
+					delete puzzle;
+					puzzle = localPuzzle;
+				}
+			}
+		}
+#else
 		puzzle->greedy();
+#endif //PARALLEL
 
 #ifdef GETEXECUTIONTIME
 		microTime = duration_cast< microseconds >(

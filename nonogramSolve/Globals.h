@@ -9,6 +9,8 @@ using namespace std;
 #define RUNGREEDY
 //#define RUNLIKEHUMAN
 
+#define PARALLEL
+
 #define PRETTYPRINT
 //#define DEBUG
 //#define GETEXECUTIONTIME
@@ -17,6 +19,7 @@ using namespace std;
 const string NONOPATH = "C:\\Users\\holtza\\Documents\\nono\\";  //Work
 const int PRINTTOOLONG = 3;
 const int PRINTTOOLONGINTERVAL = 2;
+bool RACENOTFINISHED;
 const char PRINTCHARS[] = { char(32), '.', char(219), char(178), char(177), char(176),
 '$', '@', 'B', '%', '8', '&', 'W', 'M', '#', '*', 'o', 'a', 'h', 'k', 'b', 'd', 'p',
 'q', 'w', 'm', 'Z', 'O', '0', 'Q', 'L', 'C', 'J', 'U', 'Y', 'X', 'z', 'c', 'v', 'u',

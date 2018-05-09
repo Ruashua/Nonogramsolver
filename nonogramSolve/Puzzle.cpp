@@ -157,7 +157,21 @@ void Puzzle::mirrorPuzzle(Tomography*& tomographyMirrorAxis, Tomography*& tomogr
 
 	tomographyWidth->print();
 }
-
+void Puzzle::transOrMirrorForParallel(int number)
+{
+	if ((number & 1) == 1)
+	{
+		mirrorPuzzle(tomographyWidth, tomographyHeight);
+	}
+	if (((number >> 1) & 1) == 1)
+	{
+		mirrorPuzzle(tomographyHeight, tomographyWidth);
+	}
+	if (((number >> 2) & 1) == 1)
+	{
+		transposePuzzle();
+	}
+}
 bool Puzzle::bruteForceValidity(int i, int j, bool& tooLong, time_t& startTime)	//Returns whether or not the current block is valid with the brute force algorithm
 {
 	int count;
@@ -544,7 +558,7 @@ bool Puzzle::greedyValidityFront(bool****& dpValidityGrid, int i, int j, int c)
 	return !dpValidityGrid[i][j][c][1];
 }
 
-void Puzzle::greedy()  //OK....redo.... make it less efficient but more organized.
+bool Puzzle::greedy()  //OK....redo.... make it less efficient but more organized.
 {
 	int i, j, k, l, m, n; //counters
 	bool needLoopThroughSections, needLoopThroughColumns, needToMakeSpaces, needCalcRoomNeeded, needBacktrack, needBacktrackLastOne;
@@ -585,7 +599,7 @@ void Puzzle::greedy()  //OK....redo.... make it less efficient but more organize
 	needBacktrackLastOne = false;
 
 			
-	while (needLoopThroughSections) //TODO loop through sections/spaces
+	while (needLoopThroughSections && RACENOTFINISHED) //TODO loop through sections/spaces
 	{
 		if (needBacktrackLastOne)
 		{
@@ -766,6 +780,16 @@ void Puzzle::greedy()  //OK....redo.... make it less efficient but more organize
 		delete[] dpValidityGrid[i];
 	}
 	delete[] dpValidityGrid;
+
+	if (!RACENOTFINISHED)
+	{
+		return false;
+	}
+	else
+	{
+		RACENOTFINISHED = false;
+		return true;
+	}
 }
 
 void Puzzle::placeTrivial()  //TODO
