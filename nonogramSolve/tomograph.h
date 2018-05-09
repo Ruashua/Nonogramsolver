@@ -8,6 +8,7 @@ public:
 	int startPosition;
 
 	Tomograph(int n, short c);
+	Tomograph(const Tomograph& obj);
 	Tomograph();
 	~Tomograph();
 };

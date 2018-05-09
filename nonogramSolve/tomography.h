@@ -15,6 +15,7 @@ public:
 	int* sizes;
 
 	Tomography(int n);
+	Tomography(const Tomography& obj);
 	Tomography();
 	~Tomography();
 

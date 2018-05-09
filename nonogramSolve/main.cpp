@@ -11,8 +11,6 @@
 #endif //PARALLEL
 #include "Puzzle.h"
 
-
-
 using namespace std;
 #ifdef GETEXECUTIONTIME
 using namespace std::chrono;
@@ -28,16 +26,16 @@ int main()
 	
 
 	string inputFiles[] = {
-		
-		//"5x5rune.txt", 
-		//"10x10tree.txt",
-		//"12x12bee.txt",
-		//"15x15trivial.txt",
-		//"15x15turtle.txt",
-		//"15x20cock.txt",
-		//"19x19-9-dom.txt",
+		/*
+		"5x5rune.txt", 
+		"10x10tree.txt",
+		"12x12bee.txt",
+		"15x15trivial.txt",
+		"15x15turtle.txt",
+		"15x20cock.txt",
+		"19x19-9-dom.txt",
 		"20x15goldfish.txt",
-		/*//"20x20peacock.txt",
+		"20x20peacock.txt",//*/
 		"25x25lion.txt",
 		"C5x5Target.txt",
 		"C8x8Mushroom.txt", 
@@ -45,7 +43,7 @@ int main()
 		"C16x25Sakura.txt",
 		"C18x25Match.txt",
 		"C20x20Ladybug.txt",
-		"C20x20Swan.txt" //*/
+		"C20x20Swan.txt" 
 		//"47x40Sierp(VeryHard).txt",  //Warning!!!
 		//"80x80MichaelJackson.txt",  //Warning!!!
 	};
@@ -83,8 +81,6 @@ int main()
 #endif //GETEXECUTIONTIME
 
 		readFile(puzzle, NONOPATH + inputFiles[i]);
-		//puzzle->transposePuzzle();
-		puzzle->mirrorPuzzle(puzzle->tomographyWidth, puzzle->tomographyHeight);
 
 #ifdef DEBUG
 		puzzle->tomographyWidth->print();
@@ -126,18 +122,38 @@ int main()
 		RACENOTFINISHED = true;
 #pragma omp parallel num_threads(8)
 		{
+			
 			bool finished = false;
-			Puzzle* localPuzzle = new Puzzle(puzzle);
-			localPuzzle->transOrMirrorForParallel(omp_get_thread_num());
+			Puzzle* localPuzzle;
+#pragma omp critical
+			{
+				cout << "Thread " << omp_get_thread_num() << endl;
+				puzzle->tomographyWidth->print();
+				puzzle->tomographyHeight->print();
+				localPuzzle = new Puzzle(*puzzle);
+				localPuzzle->tomographyHeight->print();
+				localPuzzle->tomographyWidth->print();
+				localPuzzle->transOrMirrorForParallel(omp_get_thread_num());
+				localPuzzle->tomographyHeight->print();
+				localPuzzle->tomographyWidth->print();
+				system("pause");
+			}
+			
+#pragma omp barrier
 			finished = localPuzzle->greedy();
-
+#pragma omp barrier
 			if (finished)
 			{
 #pragma omp critical
 				{
 					delete puzzle;
 					puzzle = localPuzzle;
+					cout << "Thread " << omp_get_thread_num() << " was first!"<<endl;
 				}
+			}
+			else
+			{
+				delete localPuzzle;
 			}
 		}
 #else

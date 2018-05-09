@@ -10,6 +10,32 @@ Puzzle::Puzzle() :_width(0), _height(0)	//DO NOT USE
 	bgColor = "255 255 255 ";
 	numberOfColors = 0;
 }
+Puzzle::Puzzle(const Puzzle& obj)
+{
+	numberOfColors = obj.numberOfColors;
+	_height = obj._height;
+	_width = obj._width;
+	bgColor = obj.bgColor;
+
+	colors = new string[numberOfColors];
+	for (int i = 0; i < numberOfColors; i++)
+	{
+		colors[i] = obj.colors[i];
+	}
+
+	theGrid = new short*[_width];
+	for (int i = 0; i < _width; i++)
+	{
+		theGrid[i] = new short[_height];
+		for (int j = 0; j < _height; j++)
+		{
+			theGrid[i][j] = obj.theGrid[i][j];
+		}
+	}
+
+	tomographyWidth = new Tomography(*obj.tomographyWidth);
+	tomographyHeight = new Tomography(*obj.tomographyHeight);
+}
 Puzzle::Puzzle(int w, int h, int c):_width(w), _height(h)	//Initializes the puzzle and arrays with the width, height, and number of colors.  This should really be the only constructor used.
 {
 
@@ -154,8 +180,6 @@ void Puzzle::mirrorPuzzle(Tomography*& tomographyMirrorAxis, Tomography*& tomogr
 
 	delete tomographyOtherAxis;
 	tomographyOtherAxis = otherAxis;
-
-	tomographyWidth->print();
 }
 void Puzzle::transOrMirrorForParallel(int number)
 {
@@ -560,7 +584,7 @@ bool Puzzle::greedyValidityFront(bool****& dpValidityGrid, int i, int j, int c)
 
 bool Puzzle::greedy()  //OK....redo.... make it less efficient but more organized.
 {
-	int i, j, k, l, m, n; //counters
+	int i, j, k, l, m; //counters
 	bool needLoopThroughSections, needLoopThroughColumns, needToMakeSpaces, needCalcRoomNeeded, needBacktrack, needBacktrackLastOne;
 	int roomNeeded;
 	int backTrackUndoAmount, backTrackJumpForwardAmount;

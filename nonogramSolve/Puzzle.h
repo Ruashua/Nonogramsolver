@@ -10,7 +10,6 @@
 #include "Globals.h"
 
 
-
 class Puzzle
 {
 public:
@@ -27,6 +26,7 @@ public:
 	Tomography* tomographyHeight;	//The tomography on the side, spanning the height
 
 	Puzzle();	//DO NOT USE
+	Puzzle(const Puzzle& obj);
 	Puzzle(int w, int h, int c);	//Initializes the puzzle and arrays with the width, height, and number of colors.  This should really be the only constructor used.
 	~Puzzle();
 
