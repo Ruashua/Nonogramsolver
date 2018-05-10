@@ -12,11 +12,11 @@ using namespace std;
 #define PARALLEL
 
 //#define PRETTYPRINT
-#define DEBUG
+//#define DEBUG
 //#define GETEXECUTIONTIME
 #define DEFAULTBGCOLOR "255 255 255 " //const string DEFAULTBGCOLOR = "255 255 255 ";
-//const string NONOPATH = "C:\\Users\\Ruashua\\Documents\\nono\\";  //Home
-const string NONOPATH = "C:\\Users\\holtza\\Documents\\nono\\";  //Work
+const string NONOPATH = "C:\\Users\\Ruashua\\Documents\\nono\\";  //Home
+//const string NONOPATH = "C:\\Users\\holtza\\Documents\\nono\\";  //Work
 const int PRINTTOOLONG = 3;
 const int PRINTTOOLONGINTERVAL = 2;
 extern bool RACENOTFINISHED;

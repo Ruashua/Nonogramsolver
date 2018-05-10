@@ -111,7 +111,7 @@ void Puzzle::printTheGrid(int column)	//Prints grid to console up to a column
 
 void Puzzle::printTheGrid()	//Prints grid to console
 {
-	std::system("cls");
+	//std::system("cls");
 	for (int l = 0; l < _height; l++)
 	{
 		for (int k = 0; k < _width; k++)
@@ -123,12 +123,24 @@ void Puzzle::printTheGrid()	//Prints grid to console
 	cout << endl;
 }
 
-void Puzzle::transposePuzzle()  //Swaps width and height (resets theGrid to zero)
+void Puzzle::transposePuzzle()  //Swaps width and height
 {
 	Tomography* t;
 	t = tomographyHeight;
 	tomographyHeight = tomographyWidth;
 	tomographyWidth = t;
+
+	short** tempGrid;
+	tempGrid = new short*[_height];
+	for (int i = 0; i < _height; i++)
+	{
+		tempGrid[i] = new short[_width];
+		for (int j = 0; j < _width; j++)
+		{
+			tempGrid[i][j] = theGrid[j][i];
+		}
+	}
+	//zeroTheGrid();
 
 	for (int i = 0; i < _width; i++)
 	{
@@ -141,15 +153,10 @@ void Puzzle::transposePuzzle()  //Swaps width and height (resets theGrid to zero
 	_width = _height;
 	_height = i;
 
-	theGrid = new short*[_width];
-	for (int i = 0; i < _width; i++)
-	{
-		theGrid[i] = new short[_height];
-	}
-	zeroTheGrid();
+	theGrid = tempGrid;
 }
 
-void Puzzle::mirrorPuzzle(Tomography*& tomographyMirrorAxis, Tomography*& tomographyOtherAxis)  //Mirrors puzzle over an axis. So if width is first variable, it mirrors the width.
+void Puzzle::mirrorPuzzle(Tomography*& tomographyMirrorAxis, Tomography*& tomographyOtherAxis, bool overWidth)  //Mirrors puzzle over an axis. So if width is first variable, it mirrors the width.
 {
 	Tomography* mirrorAxis = new Tomography(tomographyMirrorAxis->dimensionSize);
 	Tomography* otherAxis = new Tomography(tomographyOtherAxis->dimensionSize);
@@ -157,7 +164,16 @@ void Puzzle::mirrorPuzzle(Tomography*& tomographyMirrorAxis, Tomography*& tomogr
 	for (int i = tomographyMirrorAxis->dimensionSize - 1; i >= 0; i--)
 	{
 		mirrorAxis->sizes[tomographyMirrorAxis->dimensionSize - 1 - i] = tomographyMirrorAxis->sizes[i];
-		mirrorAxis->tomography[tomographyMirrorAxis->dimensionSize - 1 - i] = new Tomograph*[tomographyMirrorAxis->sizes[i]];
+		
+		if (tomographyMirrorAxis->sizes[i] == 0)
+		{
+			mirrorAxis->tomography[tomographyMirrorAxis->dimensionSize - 1 - i] = new Tomograph*[1];
+			mirrorAxis->tomography[tomographyMirrorAxis->dimensionSize - 1 - i][0] = new Tomograph(tomographyMirrorAxis->tomography[i][0]->number, tomographyMirrorAxis->tomography[i][0]->color);
+		}
+		else
+		{
+			mirrorAxis->tomography[tomographyMirrorAxis->dimensionSize - 1 - i] = new Tomograph*[tomographyMirrorAxis->sizes[i]];
+		}
 		for (int j = 0; j < tomographyMirrorAxis->sizes[i]; j++)
 		{
 			mirrorAxis->tomography[tomographyMirrorAxis->dimensionSize - 1 - i][j] = new Tomograph(tomographyMirrorAxis->tomography[i][j]->number, tomographyMirrorAxis->tomography[i][j]->color);
@@ -171,7 +187,17 @@ void Puzzle::mirrorPuzzle(Tomography*& tomographyMirrorAxis, Tomography*& tomogr
 	for (int i = 0; i < tomographyOtherAxis->dimensionSize; i++)
 	{
 		otherAxis->sizes[i] = tomographyOtherAxis->sizes[i];
-		otherAxis->tomography[i] = new Tomograph*[tomographyOtherAxis->sizes[i]];
+		if (otherAxis->sizes[i] == 0)
+		{
+			otherAxis->tomography[i] = new Tomograph*[1];
+			otherAxis->tomography[i][0] = new Tomograph(tomographyOtherAxis->tomography[i][0]->number, tomographyOtherAxis->tomography[i][0]->color);
+		}
+		else
+		{
+			
+			otherAxis->tomography[i] = new Tomograph*[tomographyOtherAxis->sizes[i]];
+		}
+
 		for (int j = tomographyOtherAxis->sizes[i] - 1; j >=0; j--)
 		{
 			otherAxis->tomography[i][tomographyOtherAxis->sizes[i] - 1 - j] = new Tomograph(tomographyOtherAxis->tomography[i][j]->number, tomographyOtherAxis->tomography[i][j]->color);
@@ -180,22 +206,64 @@ void Puzzle::mirrorPuzzle(Tomography*& tomographyMirrorAxis, Tomography*& tomogr
 
 	delete tomographyOtherAxis;
 	tomographyOtherAxis = otherAxis;
+
+	short temp;
+	if (overWidth)
+	{
+		for (int i = 0; i < _width / 2; i++)
+		{
+			for (int j = 0; j < _height; j++)
+			{
+				temp = theGrid[i][j];
+				theGrid[i][j] = theGrid[_width - i - 1][j];
+				theGrid[_width - i - 1][j] = temp;
+			}
+		}
+	}
+	else
+	{
+		for (int i = 0; i < _width; i++)
+		{
+			for (int j = 0; j < _height / 2; j++)
+			{
+				temp = theGrid[i][j];
+				theGrid[i][j] = theGrid[i][_height - j - 1];
+				theGrid[i][_height - j - 1] = temp;
+			}
+		}
+	}
 }
 void Puzzle::transOrMirrorForParallel(int number)
 {
 	if ((number & 1) == 1)
 	{
-		mirrorPuzzle(tomographyWidth, tomographyHeight);
+		mirrorPuzzle(tomographyWidth, tomographyHeight, true);
 	}
 	if (((number >> 1) & 1) == 1)
 	{
-		mirrorPuzzle(tomographyHeight, tomographyWidth);
+		mirrorPuzzle(tomographyHeight, tomographyWidth, false);
 	}
 	if (((number >> 2) & 1) == 1)
 	{
 		transposePuzzle();
 	}
 }
+void Puzzle::undoTransOrMirrorForParallel(int number)
+{
+	if (((number >> 2) & 1) == 1)
+	{
+		transposePuzzle();
+	}
+	if (((number >> 1) & 1) == 1)
+	{
+		mirrorPuzzle(tomographyHeight, tomographyWidth, false);
+	}
+	if ((number & 1) == 1)
+	{
+		mirrorPuzzle(tomographyWidth, tomographyHeight, true);
+	}
+}
+
 bool Puzzle::bruteForceValidity(int i, int j, bool& tooLong, time_t& startTime)	//Returns whether or not the current block is valid with the brute force algorithm
 {
 	int count;
@@ -639,6 +707,11 @@ bool Puzzle::greedy()  //OK....redo.... make it less efficient but more organize
 				}
 				i--;
 				k = tomographyWidth->sizes[i] - 1;
+				if (tomographyWidth->tomography[i][0]->number == 0)
+				{
+					continue;
+				}
+
 			}
 			j = tomographyWidth->tomography[i][k]->startPosition;
 			needBacktrackLastOne = false;
@@ -708,71 +781,78 @@ bool Puzzle::greedy()  //OK....redo.... make it less efficient but more organize
 		}
 		else
 		{
-			if (needCalcRoomNeeded) //If the minimum room needed hasnt been calculated, calculate it
+			if (tomographyWidth->tomography[i][k]->number == 0)
 			{
-				roomNeeded = calcNeededRoom(tomographyWidth, i, k);
-				needCalcRoomNeeded = false;
+				i++;
 			}
-			if ((_height - j) < roomNeeded)	//automatically needs to backtrack if there is no more room
+			else
 			{
-				needBacktrack = true;
-				needBacktrackLastOne = true;
-				continue; //TODO, need backtrack
-			}
-			tomographyWidth->tomography[i][k]->startPosition = j;
-			for (l = j; l < tomographyWidth->tomography[i][k]->number + j; l++)  //Loop through the placement of the tomography section
-			{
-				theGrid[i][l] = short(tomographyWidth->tomography[i][k]->color + 1);
-#ifdef DEBUG	
-				printTheGrid();
-				//std::system("pause");		
-#endif
-				needBacktrack = greedyValidityFront(dpValidityGrid, i, l, tomographyWidth->tomography[i][k]->color);
-				if (needBacktrack)
+				if (needCalcRoomNeeded) //If the minimum room needed hasnt been calculated, calculate it
 				{
-					backTrackUndoAmount = l + 1 - j;
-					backTrackJumpForwardAmount = l + 1 - j;
-					break;
+					roomNeeded = calcNeededRoom(tomographyWidth, i, k);
+					needCalcRoomNeeded = false;
 				}
-			}
-			if (!needBacktrack)
-			{
-#ifdef PRETTYPRINT
-				if (!tooLong)
+				if ((_height - j) < roomNeeded)	//automatically needs to backtrack if there is no more room
 				{
-					printTheGrid(i+1);
-					if (time(0) - startTime > PRINTTOOLONG)
+					needBacktrack = true;
+					needBacktrackLastOne = true;
+					continue; //TODO, need backtrack
+				}
+				tomographyWidth->tomography[i][k]->startPosition = j;
+				for (l = j; l < tomographyWidth->tomography[i][k]->number + j; l++)  //Loop through the placement of the tomography section
+				{
+					theGrid[i][l] = short(tomographyWidth->tomography[i][k]->color + 1);
+#ifdef DEBUG	
+					printTheGrid();
+					//std::system("pause");		
+#endif
+					needBacktrack = greedyValidityFront(dpValidityGrid, i, l, tomographyWidth->tomography[i][k]->color);
+					if (needBacktrack)
 					{
-						tooLong = true;
+						backTrackUndoAmount = l + 1 - j;
+						backTrackJumpForwardAmount = l + 1 - j;
+						break;
+					}
+				}
+				if (!needBacktrack)
+				{
+#ifdef PRETTYPRINT
+					if (!tooLong)
+					{
+						printTheGrid(i + 1);
+						if (time(0) - startTime > PRINTTOOLONG)
+						{
+							tooLong = true;
+							startTime = time(0);
+						}
+					}
+					else if (time(0) - startTime > PRINTTOOLONGINTERVAL)
+					{
+						printTheGrid(i + 1);
 						startTime = time(0);
 					}
-				}
-				else if (time(0) - startTime > PRINTTOOLONGINTERVAL)
-				{
-					printTheGrid(i + 1);
-					startTime = time(0);
-				}
 #endif // PRETTYPRINT
-				j = l;
-				if (k < tomographyWidth->sizes[i] - 1)
-				{
-					if (tomographyWidth->tomography[i][k]->color == tomographyWidth->tomography[i][k + 1]->color)
+					j = l;
+					if (k < tomographyWidth->sizes[i] - 1)
 					{
-						needToMakeSpaces = true;
-						spacesNeeded = 1;
+						if (tomographyWidth->tomography[i][k]->color == tomographyWidth->tomography[i][k + 1]->color)
+						{
+							needToMakeSpaces = true;
+							spacesNeeded = 1;
+						}
+						else
+						{
+							needToMakeSpaces = true;
+							spacesNeeded = 0;
+						}
 					}
-					else
+					else if (k == tomographyWidth->sizes[i] - 1)
 					{
-						needToMakeSpaces = true;
-						spacesNeeded = 0;
-					}
-				}
-				else if (k == tomographyWidth->sizes[i] - 1)
-				{
-					if (j != _height)
-					{
-						needToMakeSpaces = true;
-						spacesNeeded = _height - j;
+						if (j != _height)
+						{
+							needToMakeSpaces = true;
+							spacesNeeded = _height - j;
+						}
 					}
 				}
 			}

@@ -35,7 +35,7 @@ int main()
 		"15x20cock.txt",
 		"19x19-9-dom.txt",
 		"20x15goldfish.txt",
-		"20x20peacock.txt",//*/
+		"20x20peacock.txt",
 		"25x25lion.txt",
 		"C5x5Target.txt",
 		"C8x8Mushroom.txt", 
@@ -43,13 +43,10 @@ int main()
 		"C16x25Sakura.txt",
 		"C18x25Match.txt",
 		"C20x20Ladybug.txt",
-		"C20x20Swan.txt" 
-		//"47x40Sierp(VeryHard).txt",  //Warning!!!
+		"C20x20Swan.txt" //*/
+		"47x40Sierp(VeryHard).txt",  //Warning!!!
 		//"80x80MichaelJackson.txt",  //Warning!!!
 	};
-
-
-
 
 	//std::system("pause");
 
@@ -86,7 +83,7 @@ int main()
 		puzzle->tomographyWidth->print();
 		cout << endl;
 		puzzle->tomographyHeight->print();
-		system("pause");
+		std::system("pause");
 #endif //DEBUG
 
 #ifdef RUNBRUTEFORCE
@@ -117,9 +114,9 @@ int main()
 			);
 		executionTime[i][algorithmCounter] = microTime.count();
 #endif //GETEXECUTIONTIME
-
-#ifdef PARALLEL
 		RACENOTFINISHED = true;
+#ifdef PARALLEL
+		
 #pragma omp parallel num_threads(8)
 		{
 			
@@ -127,28 +124,20 @@ int main()
 			Puzzle* localPuzzle;
 #pragma omp critical
 			{
-				cout << "Thread " << omp_get_thread_num() << endl;
-				puzzle->tomographyWidth->print();
-				puzzle->tomographyHeight->print();
 				localPuzzle = new Puzzle(*puzzle);
-				localPuzzle->tomographyHeight->print();
-				localPuzzle->tomographyWidth->print();
 				localPuzzle->transOrMirrorForParallel(omp_get_thread_num());
-				localPuzzle->tomographyHeight->print();
-				localPuzzle->tomographyWidth->print();
-				system("pause");
 			}
 			
 #pragma omp barrier
 			finished = localPuzzle->greedy();
-#pragma omp barrier
 			if (finished)
 			{
 #pragma omp critical
 				{
+					std::cout << "Thread " << omp_get_thread_num() << " was first!" << endl;
 					delete puzzle;
 					puzzle = localPuzzle;
-					cout << "Thread " << omp_get_thread_num() << " was first!"<<endl;
+					puzzle->undoTransOrMirrorForParallel(omp_get_thread_num());
 				}
 			}
 			else
@@ -314,7 +303,8 @@ void readFile(Puzzle*& puzzle, string filePath)
 				}
 				else
 				{
-					puzzle->tomographyWidth->tomography[i][j] = nullptr;
+					//puzzle->tomographyWidth->tomography[i][j] = nullptr;
+					puzzle->tomographyWidth->tomography[i][j] = new Tomograph(0, 0);
 					puzzle->tomographyWidth->sizes[i] = 0;
 				}
 				j++;
@@ -348,7 +338,8 @@ void readFile(Puzzle*& puzzle, string filePath)
 				}
 				else
 				{
-					puzzle->tomographyHeight->tomography[i][j] = nullptr;
+					//puzzle->tomographyHeight->tomography[i][j] = nullptr; 
+					puzzle->tomographyHeight->tomography[i][j] = new Tomograph(0, 0);
 					puzzle->tomographyHeight->sizes[i] = 0;
 				}
 				j++;

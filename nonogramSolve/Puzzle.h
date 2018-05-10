@@ -34,8 +34,9 @@ public:
 	void Puzzle::printTheGrid(int column); //Prints grid to console up to a column
 	void printTheGrid();	//Prints grid to console
 	void Puzzle::transposePuzzle();  //Swaps width and height (resets theGrid to zero)
-	void Puzzle::mirrorPuzzle(Tomography*& tomographyMirrorAxis, Tomography*& tomographyOtherAxis);  //Mirrors puzzle over an axis. So if width is first variable, it mirrors the width.
+	void Puzzle::mirrorPuzzle(Tomography*& tomographyMirrorAxis, Tomography*& tomographyOtherAxis, bool overWidth);  //Mirrors puzzle over an axis. So if width is first variable, it mirrors the width.
 	void Puzzle::transOrMirrorForParallel(int number);
+	void Puzzle::undoTransOrMirrorForParallel(int number);
 
 	bool bruteForceValidity(int i, int j, bool& tooLong, time_t& startTime);	//Returns whether or not the current block is valid with the brute force algorithm
 	void bruteForce();	//Solves the puzzle by placing and checking one block at a time starting at the top left, going along the columns.  Very inefficient.
