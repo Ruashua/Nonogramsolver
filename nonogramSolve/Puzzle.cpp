@@ -111,7 +111,7 @@ void Puzzle::printTheGrid(int column)	//Prints grid to console up to a column
 
 void Puzzle::printTheGrid()	//Prints grid to console
 {
-	//std::system("cls");
+	std::system("cls");
 	for (int l = 0; l < _height; l++)
 	{
 		for (int k = 0; k < _width; k++)

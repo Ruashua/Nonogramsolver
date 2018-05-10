@@ -25,28 +25,7 @@ int main()
 	Puzzle* puzzle = nullptr;
 	
 
-	string inputFiles[] = {
-		/*
-		"5x5rune.txt", 
-		"10x10tree.txt",
-		"12x12bee.txt",
-		"15x15trivial.txt",
-		"15x15turtle.txt",
-		"15x20cock.txt",
-		"19x19-9-dom.txt",
-		"20x15goldfish.txt",
-		"20x20peacock.txt",
-		"25x25lion.txt",
-		"C5x5Target.txt",
-		"C8x8Mushroom.txt", 
-		"C19x13BrazilFlag.txt",
-		"C16x25Sakura.txt",
-		"C18x25Match.txt",
-		"C20x20Ladybug.txt",
-		"C20x20Swan.txt" //*/
-		"47x40Sierp(VeryHard).txt",  //Warning!!!
-		//"80x80MichaelJackson.txt",  //Warning!!!
-	};
+	
 
 	//std::system("pause");
 
@@ -78,7 +57,8 @@ int main()
 #endif //GETEXECUTIONTIME
 
 		readFile(puzzle, NONOPATH + inputFiles[i]);
-
+		
+		
 #ifdef DEBUG
 		puzzle->tomographyWidth->print();
 		cout << endl;
@@ -108,12 +88,7 @@ int main()
 
 #ifdef RUNGREEDY
 		puzzle->zeroTheGrid();
-#ifdef GETEXECUTIONTIME
-		microTime = duration_cast< microseconds >(
-			system_clock::now().time_since_epoch()
-			);
-		executionTime[i][algorithmCounter] = microTime.count();
-#endif //GETEXECUTIONTIME
+
 		RACENOTFINISHED = true;
 #ifdef PARALLEL
 		
@@ -122,19 +97,36 @@ int main()
 			
 			bool finished = false;
 			Puzzle* localPuzzle;
-#pragma omp critical
-			{
-				localPuzzle = new Puzzle(*puzzle);
-				localPuzzle->transOrMirrorForParallel(omp_get_thread_num());
-			}
+			unsigned long long localTimeStart;
+			microseconds localMicroTime;
+
+			localPuzzle = new Puzzle(*puzzle);
+			localPuzzle->transOrMirrorForParallel(omp_get_thread_num());
 			
 #pragma omp barrier
+#ifdef GETEXECUTIONTIME
+			localMicroTime = duration_cast< microseconds >(
+				system_clock::now().time_since_epoch()
+				);
+			localTimeStart = localMicroTime.count();
+#endif //GETEXECUTIONTIME
+
 			finished = localPuzzle->greedy();
+
+#ifdef GETEXECUTIONTIME
+			localMicroTime = duration_cast< microseconds >(
+				system_clock::now().time_since_epoch()
+				);
+#endif //GETEXECUTIONTIME
+
 			if (finished)
 			{
 #pragma omp critical
 				{
-					std::cout << "Thread " << omp_get_thread_num() << " was first!" << endl;
+#ifdef GETEXECUTIONTIME
+					executionTime[i][algorithmCounter] = localMicroTime.count() - localTimeStart;
+#endif //GETEXECUTIONTIME
+					std::cout << "Thread " << omp_get_thread_num() << " was first at " << executionTime[i][algorithmCounter] << char(230) << "s" << endl;
 					delete puzzle;
 					puzzle = localPuzzle;
 					puzzle->undoTransOrMirrorForParallel(omp_get_thread_num());
@@ -146,14 +138,22 @@ int main()
 			}
 		}
 #else
+#ifdef GETEXECUTIONTIME
+		microTime = duration_cast< microseconds >(
+			system_clock::now().time_since_epoch()
+			);
+		executionTime[i][algorithmCounter] = microTime.count();
+#endif //GETEXECUTIONTIME
 		puzzle->greedy();
-#endif //PARALLEL
-
 #ifdef GETEXECUTIONTIME
 		microTime = duration_cast< microseconds >(
 			system_clock::now().time_since_epoch()
 			);
 		executionTime[i][algorithmCounter] = microTime.count() - executionTime[i][algorithmCounter];
+#endif //GETEXECUTIONTIME
+#endif //PARALLEL
+
+#ifdef GETEXECUTIONTIME
 		algorithmCounter++;
 #endif //GETEXECUTIONTIME
 #endif // RUNGREEDY
@@ -184,7 +184,7 @@ int main()
 	}
 
 #ifdef GETEXECUTIONTIME
-	std::system("cls");
+	//std::system("cls");
 	for (int i = 0; i < sizeof(inputFiles) / sizeof(inputFiles[0]); i++)
 	{
 		cout << inputFiles[i] << ":   ";
