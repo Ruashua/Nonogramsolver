@@ -9,6 +9,7 @@
 #ifdef PARALLEL
 #include <omp.h>
 #endif //PARALLEL
+#include <Windows.h>
 #include "Puzzle.h"
 
 using namespace std;
@@ -19,6 +20,13 @@ using namespace std::chrono;
 string colorHexToRgb(string hexColor);
 void readFile(Puzzle*& puzzle, string filePath);
 void outputPicture(Puzzle* puzzle, string filePath);
+void outputHeatmaps(Puzzle* puzzle, string filePath)
+{
+	int* heatWidth, heatHeight;
+	string** heatMap;
+
+
+}
 
 int main()
 {
@@ -27,7 +35,7 @@ int main()
 
 	
 
-	//std::system("pause");
+	std::system("pause");
 
 #ifdef GETEXECUTIONTIME
 	int numberOfAlgorithms;
@@ -57,7 +65,7 @@ int main()
 #endif //GETEXECUTIONTIME
 
 		readFile(puzzle, NONOPATH + inputFiles[i]);
-		
+		puzzle->transOrMirrorForParallel(4);
 		
 #ifdef DEBUG
 		puzzle->tomographyWidth->print();
@@ -178,8 +186,13 @@ int main()
 #endif //GETEXECUTIONTIME
 #endif // RUNLIKEHUMAN
 
+		puzzle->undoTransOrMirrorForParallel(4);
+
+		std::system("cls");
+		puzzle->printTheGrid();
+		Sleep(3000);
 		outputPicture(puzzle, NONOPATH + inputFiles[i].substr(0, inputFiles[i].size() - 3) + "ppm");
-		cout << NONOPATH + inputFiles[i] << endl;
+		cout << inputFiles[i] << endl;
 		delete puzzle;
 	}
 

@@ -47,6 +47,8 @@ public:
 	bool Puzzle::greedyValidityFront(bool****& dpValidityGrid, int i, int j, int c);
 	bool Puzzle::greedy();	//Solves puzzle one tomography element at a time.  Meh efficieny.  Returns if it finished (parallel only)
 
+	int* Puzzle::tomographyHeat(Tomography*& tomographyAxis);
+
 	void Puzzle::placeTrivial();
 	void Puzzle::likeHuman();
 };

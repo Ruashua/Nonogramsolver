@@ -896,6 +896,21 @@ bool Puzzle::greedy()  //OK....redo.... make it less efficient but more organize
 	}
 }
 
+int* Puzzle::tomographyHeat(Tomography*& tomographyAxis) 
+{
+	int* heat;
+
+	heat = new int[tomographyAxis->dimensionSize];
+
+	for (int i = 0; i < tomographyAxis->dimensionSize; i++)
+	{
+
+	}
+
+
+	return heat;
+}
+
 void Puzzle::placeTrivial()  //TODO
 {
 

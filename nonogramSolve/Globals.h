@@ -18,14 +18,15 @@ using namespace std;
 //const string NONOPATH = "C:\\Users\\Ruashua\\Documents\\nono\\";  //Home
 //const string NONOPATH = "C:\\nono\\";  //Other
 const string NONOPATH = "C:\\Users\\holtza\\Documents\\nono\\";  //Work
-const int PRINTTOOLONG = 3000;
-const int PRINTTOOLONGINTERVAL = 2;
+const string HEATMAPPATH = "C:\\Users\\holtza\\Documents\\nono\\heatmaps\\";
+const int PRINTTOOLONG = 180;
+const int PRINTTOOLONGINTERVAL = 1;
 extern bool RACENOTFINISHED;
 const char PRINTCHARS[] = { char(32), '.', char(219), char(178), char(177), char(176),
-'$', '@', 'B', '%', '8', '&', 'W', 'M', '#', '*', 'o', 'a', 'h', 'k', 'b', 'd', 'p',
-'q', 'w', 'm', 'Z', 'O', '0', 'Q', 'L', 'C', 'J', 'U', 'Y', 'X', 'z', 'c', 'v', 'u',
-'n', 'x', 'r', 'j', 'f', 't', '/', '\\', '|', '(', '1', '}', ']', '\?',
-'-', '_', '+', '~', '<', 'i', '!', 'l', 'I', ';', ':', ',', '\"', '^', '`', '\'' };
+'$', '@', 'B', '%', '&', 'W', '#', '*', 'o', 'a', 'h', 'k', 'b', 'd', 'p',
+'q', 'm', 'Z', '0', 'Q', 'L', 'C', 'J', 'U', 'Y', 'X', 'c', 'v', 'u',
+'n', 'x', 'r', 'j', 'f', 't', '/', '|', '(', '1', '}', ']', '\?',
+'-', '+', '~', '<', 'i', '!', 'l', 'I', ';', ',', '\"', '^', '`', '\'' };
 
 const string inputFiles[] = {
 
@@ -45,10 +46,10 @@ const string inputFiles[] = {
 	"C16x25Sakura.txt",
 	"C18x25Match.txt",
 	"C20x20Ladybug.txt",
-	"C20x20Swan.txt", //*/
-	"C32x27Charizard.txt",
+	"C20x20Swan.txt", //
+	"C32x27Charizard (4).txt",*/
 					  //"47x40Sierp(VeryHard).txt",  //Warning!!!
-					  //"80x80MichaelJackson.txt",  //Warning!!!
+					  "80x80MichaelJackson.txt",  //Warning!!!
 };
 
 /*main(n)
