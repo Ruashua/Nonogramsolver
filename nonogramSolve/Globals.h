@@ -6,14 +6,15 @@ using namespace std;
 
 //ALGORITHMS
 //#define RUNBRUTEFORCE
-#define RUNGREEDY
+//#define RUNGREEDY
 //#define RUNLIKEHUMAN
+#define BUILDHEATMAP
 
 //#define PARALLEL
 
-#define PRETTYPRINT
+//#define PRETTYPRINT
 //#define DEBUG
-#define GETEXECUTIONTIME
+//#define GETEXECUTIONTIME
 #define DEFAULTBGCOLOR "255 255 255 " //const string DEFAULTBGCOLOR = "255 255 255 ";
 //const string NONOPATH = "C:\\Users\\Ruashua\\Documents\\nono\\";  //Home
 //const string NONOPATH = "C:\\nono\\";  //Other
@@ -30,8 +31,8 @@ const char PRINTCHARS[] = { char(32), '.', char(219), char(178), char(177), char
 
 const string inputFiles[] = {
 
-	/*"5x5rune.txt",
-	"10x10tree.txt",
+	//"5x5rune.txt",
+	//"10x10tree.txt",
 	"12x12bee.txt",
 	"15x15trivial.txt",
 	"15x15turtle.txt",
@@ -46,10 +47,10 @@ const string inputFiles[] = {
 	"C16x25Sakura.txt",
 	"C18x25Match.txt",
 	"C20x20Ladybug.txt",
-	"C20x20Swan.txt", //
-	"C32x27Charizard (4).txt",*/
-					  //"47x40Sierp(VeryHard).txt",  //Warning!!!
-					  "80x80MichaelJackson.txt",  //Warning!!!
+	"C20x20Swan.txt", 
+	"C32x27Charizard (4).txt",/*//*/
+	"47x40Sierp(VeryHard).txt",  //Warning!!!
+	"80x80MichaelJackson.txt",  //Warning!!!
 };
 
 /*main(n)

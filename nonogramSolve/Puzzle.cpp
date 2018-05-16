@@ -84,6 +84,26 @@ Puzzle::~Puzzle()
 	delete[] colors;
 }
 
+// Returns value of Binomial Coefficient C(n, k)
+unsigned long long binomialCoeff(int n, int k)
+{
+	unsigned long long res = 1;
+
+	// Since C(n, k) = C(n, n-k)
+	if (k > n - k)
+		k = n - k;
+
+	// Calculate value of [n * (n-1) *---* (n-k+1)] / [k * (k-1) *----* 1]
+	for (int i = 0; i < k; ++i)
+	{
+		res *= (n - i);
+		res /= (i + 1);
+	}
+
+	return res;
+}
+
+
 void Puzzle::zeroTheGrid()
 {
 	for (int l = 0; l < _height; l++)
@@ -896,17 +916,21 @@ bool Puzzle::greedy()  //OK....redo.... make it less efficient but more organize
 	}
 }
 
-int* Puzzle::tomographyHeat(Tomography*& tomographyAxis) 
+unsigned long long* Puzzle::tomographyHeat(Tomography*& tomographyAxis)
 {
-	int* heat;
+	unsigned long long* heat;
+	int slots, items;
 
-	heat = new int[tomographyAxis->dimensionSize];
+	heat = new unsigned long long[tomographyAxis->dimensionSize];
 
 	for (int i = 0; i < tomographyAxis->dimensionSize; i++)
 	{
-
+		items = tomographyAxis->dimensionSize - calcNeededRoom(tomographyAxis, i, 0);
+		slots = tomographyAxis->sizes[i] + 1;
+		heat[i] = binomialCoeff(slots + items - 1, items);
+		cout << heat[i] <<" ";
 	}
-
+	cout << endl;
 
 	return heat;
 }
