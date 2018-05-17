@@ -142,33 +142,76 @@ double logProt(unsigned long long value)
 	}
 }
 
-void outputHeatmaps(Puzzle* puzzle, string inputFile)
+void outputHeatmaps(Puzzle* puzzle, std::string inputFile)
 {
 	unsigned long long* heatWidth, * heatHeight;
 	double*** heatMaps;
 	double hottest, coldest;
-	string** printHeatMap;
-	//5*256
+	std::string*** printHeatMap;
+	std::string** allHeatMap;
 
-	printHeatMap = new string*[puzzle->_width];
-	for (int i = 0; i < puzzle->_width; i++)
-	{
-		printHeatMap[i] = new string[puzzle->_height];
-	}
+	unsigned long long totalTop, totalBottom, totalLeft, totalRight;
 
+	bool topBetter;
+	bool leftBetter;
+	
+	printHeatMap = new std::string**[11];
 	heatMaps = new double**[11];
 	for (int k = 0; k < 11; k++)
 	{
+		printHeatMap[k] = new std::string*[puzzle->_width];
 		heatMaps[k] = new double*[puzzle->_width];
 		for (int i = 0; i < puzzle->_width; i++)
 		{
 			heatMaps[k][i] = new double[puzzle->_height];
+			printHeatMap[k][i] = new std::string[puzzle->_height];
 		}
+	}
+
+	allHeatMap = new std::string*[6 + 3 * puzzle->_width];
+	for (int i = 0; i < (6 + 3 * puzzle->_width); i++)
+	{
+		allHeatMap[i] = new std::string[8 + 4 * puzzle->_height];
+		
 	}
 	
 	heatWidth = puzzle->tomographyHeat(puzzle->tomographyWidth);
 	heatHeight = puzzle->tomographyHeat(puzzle->tomographyHeight);
 	/////////////////////////////////////////////////////////////////////////////////////////
+
+	
+	totalLeft = totalRight = 0;
+	for (int i = 0; i < puzzle->_width; i++)
+	{
+		totalLeft += heatWidth[i] * (puzzle->_width - i) / puzzle->_width;
+		totalRight += heatWidth[i] * (i + 1) / puzzle->_width;
+	}
+	if (totalLeft < totalRight)
+	{
+		leftBetter = true;
+	}
+	else
+	{
+		leftBetter = false;
+	}
+
+	totalTop = totalBottom = 0;
+	for (int i = 0; i < puzzle->_height; i++)
+	{
+		totalTop += heatHeight[i] * (puzzle->_height - i) / puzzle->_height;
+		totalBottom += heatHeight[i] * (i + 1) / puzzle->_height;
+	}
+	if (totalTop < totalBottom)
+	{
+		topBetter = true;
+	}
+	else
+	{
+		topBetter = false;
+	}
+	cout << "Top: " << totalTop << " Bottom: " << totalBottom << " Left: " << totalLeft << " Right: " << totalRight;
+	cout << endl;
+
 	hottest = 0;
 	coldest = DBL_MAX;
 	for (int i = 0; i < puzzle->_width; i++)
@@ -196,25 +239,16 @@ void outputHeatmaps(Puzzle* puzzle, string inputFile)
 	findColdestHottest(coldest, hottest, heatMaps[0], puzzle->_width, puzzle->_height);
 	findColdestHottest(coldest, hottest, heatMaps[1], puzzle->_width, puzzle->_height);
 	findColdestHottest(coldest, hottest, heatMaps[2], puzzle->_width, puzzle->_height);
-	buildStringHeatMap(printHeatMap, heatMaps[0], puzzle->_width, puzzle->_height, coldest, hottest);
-	outputPicture(printHeatMap, puzzle->_width, puzzle->_height, HEATMAPPATH + inputFile + "WidthHeat.ppm");
-	buildStringHeatMap(printHeatMap, heatMaps[1], puzzle->_width, puzzle->_height, coldest, hottest);
-	outputPicture(printHeatMap, puzzle->_width, puzzle->_height, HEATMAPPATH + inputFile + "WidthHeat.WeightedLeft.ppm");
-	buildStringHeatMap(printHeatMap, heatMaps[2], puzzle->_width, puzzle->_height, coldest, hottest);
-	outputPicture(printHeatMap, puzzle->_width, puzzle->_height, HEATMAPPATH + inputFile + "WidthHeat.WeightedRight.ppm");
-
-	hottest = 0;
-	coldest = DBL_MAX;
 	findColdestHottest(coldest, hottest, heatMaps[3], puzzle->_width, puzzle->_height);
 	findColdestHottest(coldest, hottest, heatMaps[4], puzzle->_width, puzzle->_height);
 	findColdestHottest(coldest, hottest, heatMaps[5], puzzle->_width, puzzle->_height);
-	buildStringHeatMap(printHeatMap, heatMaps[3], puzzle->_width, puzzle->_height, coldest, hottest);
-	outputPicture(printHeatMap, puzzle->_width, puzzle->_height, HEATMAPPATH + inputFile + "HeightHeat.ppm");
-	buildStringHeatMap(printHeatMap, heatMaps[4], puzzle->_width, puzzle->_height, coldest, hottest);
-	outputPicture(printHeatMap, puzzle->_width, puzzle->_height, HEATMAPPATH + inputFile + "HeightHeat.WeightedTop.ppm");
-	buildStringHeatMap(printHeatMap, heatMaps[5], puzzle->_width, puzzle->_height, coldest, hottest);
-	outputPicture(printHeatMap, puzzle->_width, puzzle->_height, HEATMAPPATH + inputFile + "HeightHeat.WeightedBottom.ppm");
-
+	buildStringHeatMap(printHeatMap[0], heatMaps[0], puzzle->_width, puzzle->_height, coldest, hottest);
+	buildStringHeatMap(printHeatMap[1], heatMaps[1], puzzle->_width, puzzle->_height, coldest, hottest);
+	buildStringHeatMap(printHeatMap[2], heatMaps[2], puzzle->_width, puzzle->_height, coldest, hottest);
+	buildStringHeatMap(printHeatMap[3], heatMaps[3], puzzle->_width, puzzle->_height, coldest, hottest);
+	buildStringHeatMap(printHeatMap[4], heatMaps[4], puzzle->_width, puzzle->_height, coldest, hottest);
+	buildStringHeatMap(printHeatMap[5], heatMaps[5], puzzle->_width, puzzle->_height, coldest, hottest);
+	
 	hottest = 0;
 	coldest = DBL_MAX;
 	findColdestHottest(coldest, hottest, heatMaps[6], puzzle->_width, puzzle->_height);
@@ -222,39 +256,280 @@ void outputHeatmaps(Puzzle* puzzle, string inputFile)
 	findColdestHottest(coldest, hottest, heatMaps[8], puzzle->_width, puzzle->_height);
 	findColdestHottest(coldest, hottest, heatMaps[9], puzzle->_width, puzzle->_height);
 	findColdestHottest(coldest, hottest, heatMaps[10], puzzle->_width, puzzle->_height);
-	buildStringHeatMap(printHeatMap, heatMaps[6], puzzle->_width, puzzle->_height, coldest, hottest);
-	outputPicture(printHeatMap, puzzle->_width, puzzle->_height, HEATMAPPATH + inputFile + "AllHeat.ppm");
-	buildStringHeatMap(printHeatMap, heatMaps[7], puzzle->_width, puzzle->_height, coldest, hottest);
-	outputPicture(printHeatMap, puzzle->_width, puzzle->_height, HEATMAPPATH + inputFile + "AllHeat.WeightedTopLeft.ppm");
-	buildStringHeatMap(printHeatMap, heatMaps[8], puzzle->_width, puzzle->_height, coldest, hottest);
-	outputPicture(printHeatMap, puzzle->_width, puzzle->_height, HEATMAPPATH + inputFile + "AllHeat.WeightedTopRight.ppm");
-	buildStringHeatMap(printHeatMap, heatMaps[9], puzzle->_width, puzzle->_height, coldest, hottest);
-	outputPicture(printHeatMap, puzzle->_width, puzzle->_height, HEATMAPPATH + inputFile + "AllHeat.WeightedBottomLeft.ppm");
-	buildStringHeatMap(printHeatMap, heatMaps[10], puzzle->_width, puzzle->_height, coldest, hottest);
-	outputPicture(printHeatMap, puzzle->_width, puzzle->_height, HEATMAPPATH + inputFile + "AllHeat.WeightedBottomRight.ppm");
+	buildStringHeatMap(printHeatMap[6], heatMaps[6], puzzle->_width, puzzle->_height, coldest, hottest);
+	buildStringHeatMap(printHeatMap[7], heatMaps[7], puzzle->_width, puzzle->_height, coldest, hottest);
+	buildStringHeatMap(printHeatMap[8], heatMaps[8], puzzle->_width, puzzle->_height, coldest, hottest);
+	buildStringHeatMap(printHeatMap[9], heatMaps[9], puzzle->_width, puzzle->_height, coldest, hottest);
+	buildStringHeatMap(printHeatMap[10], heatMaps[10], puzzle->_width, puzzle->_height, coldest, hottest);
+
+	/*
+	outputPicture(printHeatMap[0], puzzle->_width, puzzle->_height, HEATMAPPATH + inputFile + "WidthHeat.ppm");
+	outputPicture(printHeatMap[1], puzzle->_width, puzzle->_height, HEATMAPPATH + inputFile + "WidthHeat.WeightedLeft.ppm");
+	outputPicture(printHeatMap[2], puzzle->_width, puzzle->_height, HEATMAPPATH + inputFile + "WidthHeat.WeightedRight.ppm");
+	outputPicture(printHeatMap[3], puzzle->_width, puzzle->_height, HEATMAPPATH + inputFile + "HeightHeat.ppm");
+	outputPicture(printHeatMap[4], puzzle->_width, puzzle->_height, HEATMAPPATH + inputFile + "HeightHeat.WeightedTop.ppm");
+	outputPicture(printHeatMap[5], puzzle->_width, puzzle->_height, HEATMAPPATH + inputFile + "HeightHeat.WeightedBottom.ppm");
+	outputPicture(printHeatMap[6], puzzle->_width, puzzle->_height, HEATMAPPATH + inputFile + "BothHeat.ppm");
+	outputPicture(printHeatMap[7], puzzle->_width, puzzle->_height, HEATMAPPATH + inputFile + "BothHeat.WeightedTopLeft.ppm");
+	outputPicture(printHeatMap[8], puzzle->_width, puzzle->_height, HEATMAPPATH + inputFile + "BothHeat.WeightedTopRight.ppm");
+	outputPicture(printHeatMap[9], puzzle->_width, puzzle->_height, HEATMAPPATH + inputFile + "BothHeat.WeightedBottomLeft.ppm");
+	outputPicture(printHeatMap[10], puzzle->_width, puzzle->_height, HEATMAPPATH + inputFile + "BothHeat.WeightedBottomRight.ppm");
+	*/
+	
+	int col[3];
+	int row[4];
+	col[0] = 0;
+	col[1] = 2 + puzzle->_width;
+	col[2] = 4 + 2 * puzzle->_width;
+
+	row[0] = 0;
+	row[1] = 2 + puzzle->_height;
+	row[2] = 4 + 2 * puzzle->_height;
+	row[3] = 6 + 3 * puzzle->_height;
+
+	for (int i = 0; i < (6 + 3 * puzzle->_width); i++)
+	{
+		for (int j = 0; j < (8 + 4 * puzzle->_height); j++)
+		{
+			if (i > col[0] + 1 && i < col[1] && j > row[0] + 1 && j < row[1])
+			{
+				allHeatMap[i][j] = printHeatMap[0][i - 2][j - 2];
+			}
+			else if (i > col[1] + 1 && i < col[2] && j > row[0] + 1 && j < row[1])
+			{
+				allHeatMap[i][j] = printHeatMap[1][i - puzzle->_width - 4][j - 2];
+			}
+			else if (i > col[2] + 1 && i < 6 + 3 * puzzle->_width && j > row[0] + 1 && j < row[1])
+			{
+				allHeatMap[i][j] = printHeatMap[2][i - 2 * puzzle->_width - 6][j - 2];
+			}
+
+			else if (i > col[0] + 1 && i < col[1] && j > row[1] + 1 && j < row[2])
+			{
+				allHeatMap[i][j] = printHeatMap[3][i - 2][j - puzzle->_height - 4];
+			}
+			else if (i > col[1] + 1 && i < col[2] && j > row[1] + 1 && j < row[2])
+			{
+				allHeatMap[i][j] = printHeatMap[4][i - puzzle->_width - 4][j - puzzle->_height - 4];
+			}
+			else if (i > col[2] + 1 && i < 6 + 3 * puzzle->_width && j > row[1] + 1 && j < row[2])
+			{
+				allHeatMap[i][j] = printHeatMap[5][i - 2 * puzzle->_width - 6][j - puzzle->_height - 4];
+			}
+
+			else if (i > col[0] + 1 && i < col[1] && j > row[2] + 1 && j < row[3])
+			{
+				allHeatMap[i][j] = printHeatMap[6][i - 2][j - 2 * puzzle->_height - 6];
+			}
+			else if (i > col[1] + 1 && i < col[2] && j > row[2] + 1 && j < row[3])
+			{
+				allHeatMap[i][j] = printHeatMap[7][i - puzzle->_width - 4][j - 2 * puzzle->_height - 6];
+			}
+			else if (i > col[2] + 1 && i < 6 + 3 * puzzle->_width && j > row[2] + 1 && j < row[3])
+			{
+				allHeatMap[i][j] = printHeatMap[8][i - 2 * puzzle->_width - 6][j - 2 * puzzle->_height - 6];
+			}
+
+			else if (i > col[1] + 1 && i < col[2] && j > row[3] + 1 && j < 8 + 4 * puzzle->_height)
+			{
+				allHeatMap[i][j] = printHeatMap[9][i - puzzle->_width - 4][j - 3 * puzzle->_height - 8];
+			}
+			else if (i > col[2] + 1 && i < 6 + 3 * puzzle->_width && j > row[3] + 1 && j < 8 + 4 * puzzle->_height)
+			{
+				allHeatMap[i][j] = printHeatMap[10][i - 2 * puzzle->_width - 6][j - 3 * puzzle->_height - 8];
+			}
+
+			else if ((i == col[0] && j == row[0]) || (i == col[0] && j == row[0] + 1))  //Width symbol
+			{
+				allHeatMap[i][j] = "0 0 0 ";
+			}
+			else if((i == col[1] && j == row[0]) || (i == col[1] && j == row[0] + 1)) //Width left symbol
+			{
+				allHeatMap[i][j] = "0 0 0 ";
+			}
+			else if ((i == col[1] + 1 && j == row[0]) || (i == col[1] + 1 && j == row[0] + 1)) //Width left symbol
+			{
+				allHeatMap[i][j] = "128 128 128 ";
+			}
+			else if ((i == col[2] + 1 && j == row[0]) || (i == col[2] + 1 && j == row[0] + 1)) //Width right symbol
+			{
+				allHeatMap[i][j] = "0 0 0 ";
+			}
+			else if ((i == col[2] && j == row[0]) || (i == col[2] && j == row[0] + 1)) //Width right symbol
+			{
+				allHeatMap[i][j] = "128 128 128 ";
+			}
 
 
+			else if ((i == col[0] && j == row[1]) || (i == col[0] + 1 && j == row[1]))  //height symbol
+			{
+				allHeatMap[i][j] = "0 0 0 ";
+			}
+			else if ((i == col[1] && j == row[1]) || (i == col[1] + 1 && j == row[1])) //height left symbol
+			{
+				allHeatMap[i][j] = "0 0 0 ";
+			}
+			else if ((i == col[1] && j == row[1] + 1) || (i == col[1] + 1 && j == row[1] + 1)) //height left symbol
+			{
+				allHeatMap[i][j] = "128 128 128 ";
+			}
+			else if ((i == col[2] && j == row[1] + 1) || (i == col[2] + 1 && j == row[1] + 1))  //height right symbol
+			{
+				allHeatMap[i][j] = "0 0 0 ";
+			}
+			else if ((i == col[2] && j == row[1]) || (i == col[2] + 1 && j == row[1]))  //height right symbol
+			{
+				allHeatMap[i][j] = "128 128 128 ";
+			}
 
+			else if ((i == col[0] && j == row[2]) || (i == col[0] && j == row[2] + 1) || (i == col[0] + 1 && j == row[2]) || (i == col[0] + 1 && j == row[2] + 1))  //both symbol
+			{
+				allHeatMap[i][j] = "0 0 0 ";
+			}
+			else if (i == col[1] && j == row[2]) //top left symbol
+			{
+				allHeatMap[i][j] = "0 0 0 ";
+			}
+			else if((i == col[1] + 1 && j == row[2]) || (i == col[1] && j == row[2] + 1) || (i == col[1] + 1 && j == row[2] + 1)) //top left symbol
+			{
+				allHeatMap[i][j] = "128 128 128 ";
+			}
+			else if (i == col[2] + 1 && j == row[2]) //top right symbol
+			{
+				allHeatMap[i][j] = "0 0 0 ";
+			}
+			else if ((i == col[2] && j == row[2]) || (i == col[2] && j == row[2] + 1) || (i == col[2] + 1 && j == row[2] + 1)) //top right symbol
+			{
+				allHeatMap[i][j] = "128 128 128 ";
+			}
+
+			else if (i == col[1] && j == row[3] + 1) //bottom left symbol
+			{
+				allHeatMap[i][j] = "0 0 0 ";
+			}
+			else if ((i == col[1] + 1 && j == row[3]) || (i == col[1] && j == row[3]) || (i == col[1] + 1 && j == row[3] + 1)) //bottom left symbol
+			{
+				allHeatMap[i][j] = "128 128 128 ";
+			}
+			else if (i == col[2] + 1 && j == row[3] + 1) //bottom right symbol
+			{
+				allHeatMap[i][j] = "0 0 0 ";
+			}
+			else if ((i == col[2] + 1 && j == row[3]) || (i == col[2] && j == row[3] + 1) || (i == col[2] && j == row[3])) //bottom right symbol
+			{
+				allHeatMap[i][j] = "128 128 128 ";
+			}
+
+			else if (i == 0 && j == 6 + 4 * puzzle->_height)
+			{
+				if (topBetter && leftBetter)
+				{
+					cout << "Top-left";
+					allHeatMap[i][j] = "0 0 0 ";
+				}
+				else if (topBetter && !leftBetter && totalTop <= totalRight)
+				{
+					allHeatMap[i][j] = "64 64 64 ";
+				}
+				else if (!topBetter && leftBetter && totalLeft <= totalBottom)
+				{
+					allHeatMap[i][j] = "64 64 64 ";
+				}
+				else
+				{
+					allHeatMap[i][j] = "128 128 128 ";
+				}
+			}
+			else if (i == 1 && j == 6 + 4 * puzzle->_height)
+			{
+				if (topBetter && !leftBetter)
+				{
+					allHeatMap[i][j] = "0 0 0 ";
+				}
+				else if (topBetter && leftBetter && totalTop < totalLeft)
+				{
+					allHeatMap[i][j] = "64 64 64 ";
+				}
+				else if (!topBetter && !leftBetter && totalRight < totalBottom)
+				{
+					allHeatMap[i][j] = "64 64 64 ";
+				}
+				else
+				{
+					allHeatMap[i][j] = "128 128 128 ";
+				}
+			}
+			else if (i == 0 && j == 7 + 4 * puzzle->_height)
+			{
+				if (!topBetter && leftBetter)
+				{
+					allHeatMap[i][j] = "0 0 0 ";
+				}
+				else if (topBetter && leftBetter && totalLeft <= totalTop)
+				{
+					allHeatMap[i][j] = "64 64 64 ";
+				}
+				else if (!topBetter && !leftBetter && totalBottom <= totalRight)
+				{
+					allHeatMap[i][j] = "64 64 64 ";
+				}
+				else
+				{
+					allHeatMap[i][j] = "128 128 128 ";
+				}
+			}
+			else if (i == 1 && j == 7 + 4 * puzzle->_height)
+			{
+				if (!topBetter && !leftBetter)
+				{
+					allHeatMap[i][j] = "0 0 0 ";
+				}
+				else if (!topBetter && leftBetter && totalBottom < totalLeft)
+				{
+					allHeatMap[i][j] = "64 64 64 ";
+				}
+				else if (topBetter && !leftBetter && totalRight < totalTop)
+				{
+					allHeatMap[i][j] = "64 64 64 ";
+				}
+				else
+				{
+					allHeatMap[i][j] = "128 128 128 ";
+				}
+			}
+
+			else
+			{
+				allHeatMap[i][j] = "255 255 255 ";
+			}
+		}
+	}
+
+	outputPicture(allHeatMap, 6 + 3 * puzzle->_width, 8 + 4 * puzzle->_height, HEATMAPPATH + inputFile + "allHeat.ppm");
+	
 
 	delete[] heatWidth;
 	delete[] heatHeight;
-	for (int i = 0; i < puzzle->_width; i++)
-	{
-		delete[] printHeatMap[i];
-
-	}
-	delete[] printHeatMap;
-
 	
 	for (int k = 0; k < 11; k++)
 	{
 		for (int i = 0; i < puzzle->_width; i++)
 		{
 			delete[] heatMaps[k][i];
+			delete[] printHeatMap[k][i];
 		}
 		delete[] heatMaps[k];
+		delete[] printHeatMap[k];
 	}
 	delete[] heatMaps;
+	delete[] printHeatMap;
+
+	
+	for (int i = 0; i < 6 + 3 * puzzle->_width; i++)
+	{
+		delete[] allHeatMap[i];
+	}
+	delete[] allHeatMap;
 }
 
 int main()
@@ -266,17 +541,20 @@ int main()
 
 	std::system("pause");
 
-#ifdef GETEXECUTIONTIME
 	int numberOfAlgorithms;
 	numberOfAlgorithms = 0;
+	int algorithmCounter;
 #ifdef RUNBRUTEFORCE
 	numberOfAlgorithms++;
 #endif // RUNBRUTEFORCE
 #ifdef RUNGREEDY
 	numberOfAlgorithms++;
 #endif // RUNGREEDY
+#ifdef GETEXECUTIONTIME
+	
 
-	int algorithmCounter;
+
+	
 	microseconds microTime;
 	unsigned long long** executionTime;
 	executionTime = new unsigned long long*[sizeof(inputFiles) / sizeof(inputFiles[0])];
@@ -334,9 +612,10 @@ int main()
 			
 			bool finished = false;
 			Puzzle* localPuzzle;
+#ifdef GETEXECUTIONTIME
 			unsigned long long localTimeStart;
 			microseconds localMicroTime;
-
+#endif //GETEXECUTIONTIME
 			localPuzzle = new Puzzle(*puzzle);
 			localPuzzle->transOrMirrorForParallel(omp_get_thread_num());
 			
@@ -360,10 +639,12 @@ int main()
 			{
 #pragma omp critical
 				{
+					std::cout << "Thread " << omp_get_thread_num() << " was first ";
 #ifdef GETEXECUTIONTIME
 					executionTime[i][algorithmCounter] = localMicroTime.count() - localTimeStart;
+					cout << "at " << executionTime[i][algorithmCounter] << char(230) << "s";
 #endif //GETEXECUTIONTIME
-					std::cout << "Thread " << omp_get_thread_num() << " was first at " << executionTime[i][algorithmCounter] << char(230) << "s" << endl;
+					cout << endl;
 					delete puzzle;
 					puzzle = localPuzzle;
 					puzzle->undoTransOrMirrorForParallel(omp_get_thread_num());
@@ -429,8 +710,10 @@ int main()
 
 		
 
-
-		outputPicture(puzzle, NONOPATH + inputFiles[i].substr(0, inputFiles[i].size() - 3) + "ppm");
+		if (numberOfAlgorithms > 0)
+		{
+			outputPicture(puzzle, NONOPATH + inputFiles[i].substr(0, inputFiles[i].size() - 3) + "ppm");
+		}
 		cout << inputFiles[i] << endl;
 		delete puzzle;
 	}

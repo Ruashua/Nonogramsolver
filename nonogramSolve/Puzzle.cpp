@@ -928,9 +928,9 @@ unsigned long long* Puzzle::tomographyHeat(Tomography*& tomographyAxis)
 		items = tomographyAxis->dimensionSize - calcNeededRoom(tomographyAxis, i, 0);
 		slots = tomographyAxis->sizes[i] + 1;
 		heat[i] = binomialCoeff(slots + items - 1, items);
-		cout << heat[i] <<" ";
+		//cout << heat[i] <<" ";
 	}
-	cout << endl;
+	//cout << endl;
 
 	return heat;
 }
