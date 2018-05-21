@@ -1,5 +1,6 @@
 #pragma once
 
+
 #include <string>
 
 using namespace std;
@@ -12,15 +13,16 @@ using namespace std;
 
 #define PARALLEL
 
+#define PNGPROCESSING
 //#define PRETTYPRINT
 //#define DEBUG
 //#define GETEXECUTIONTIME
 #define DEFAULTBGCOLOR "255 255 255 " //const string DEFAULTBGCOLOR = "255 255 255 ";
-const string NONOPATH = "C:\\Users\\Ruashua\\Documents\\nono\\";  //Home
-const string HEATMAPPATH = "C:\\Users\\Ruashua\\Documents\\nono\\heatmaps\\";  //Home
+//const string NONOPATH = "C:\\Users\\Ruashua\\Documents\\nono\\";  //Home
+//const string HEATMAPPATH = "C:\\Users\\Ruashua\\Documents\\nono\\heatmaps\\";  //Home
 //const string NONOPATH = "C:\\nono\\";  //Other
-//const string NONOPATH = "C:\\Users\\holtza\\Documents\\nono\\";  //Work
-//const string HEATMAPPATH = "C:\\Users\\holtza\\Documents\\nono\\heatmaps\\";  //work
+const string NONOPATH = "C:\\Users\\holtza\\Documents\\nono\\";  //Work
+const string HEATMAPPATH = "C:\\Users\\holtza\\Documents\\nono\\heatmaps\\";  //work
 const int PRINTTOOLONG = 180;
 const int PRINTTOOLONGINTERVAL = 1;
 extern bool RACENOTFINISHED;
@@ -62,3 +64,7 @@ for(i=-1;i<1;i+=.06,puts(""))
 for(r=-2;I=i,(R=r)<1;r += .03, putchar(n + 31))
 for (n = 0; b = I*I, 26>n++&&R*R + b<4; I = 2 * R*I + i, R = R*R - b + r); 
 }*/
+
+#ifdef PNGPROCESSING
+#include <png.h>
+#endif // PNGPROCESSING

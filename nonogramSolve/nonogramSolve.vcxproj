@@ -74,10 +74,16 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
-      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <OpenMPSupport>true</OpenMPSupport>
+      <AdditionalIncludeDirectories>C:\Users\holtza\Documents\Visual Studio 2015\Projects\nonogramSolve\nonogramSolve\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
+    <Link>
+      <AdditionalLibraryDirectories>C:\Users\holtza\Documents\Visual Studio 2015\Projects\nonogramSolve\nonogramSolve\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>libpngd.lib;libpng.lib;zlibstatd.lib;zlibstat.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
@@ -119,12 +125,14 @@
     </Media>
     <ClCompile Include="Globals.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="PngResources.cpp" />
     <ClCompile Include="Puzzle.cpp" />
     <ClCompile Include="tomograph.cpp" />
     <ClCompile Include="tomography.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Globals.h" />
+    <ClInclude Include="PngResources.h" />
     <ClInclude Include="Puzzle.h" />
     <ClInclude Include="tomograph.h" />
     <ClInclude Include="tomography.h" />
